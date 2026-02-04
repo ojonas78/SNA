@@ -2,7 +2,7 @@
 Advanced R and GIS for Spatial Network Analysis - University of Augsburg
 
 # Research Question
-
+"How do the GEN26 participating universities collaborate in scientific research? A spatial network analysis of co-authorship patterns and institutional partnerships (2023-2026)."
 
 # Introduction
 On June 24, 2019, Milan received the momentous announcement in Lausanne, Switzerland, that it would host the 2026 Winter Olympics alongside Cortina d'Ampezzo.
@@ -39,14 +39,14 @@ The GEN26 program has demonstrated remarkable reach since its launch:
 Demonstration of end-to-end course pipeline.
 ### 1. Fetching Scopus API Data
 **GET API:**
-[https://api.elsevier.com/content/search/scopus?query=PUBYEAR > 2023 AND (AFFIL("Università Bocconi") OR AFFIL("Università degli studi di Verona") OR AFFIL("Università Cattolica del Sacro Cuore") OR AFFIL("Università IULM Milano") OR AFFIL("Politecnico di Milano"))](https://api.elsevier.com/content/search/scopus?query=PUBYEAR%20%3E%202023%20AND%20(AFFIL("Università%20Bocconi")%20OR%20AFFIL("Università%20degli%20studi%20di%20Verona")%20OR%20AFFIL("Università%20Cattolica%20del%20Sacro%20Cuore")%20OR%20AFFIL("Università%20IULM%20Milano")%20OR%20AFFIL("Politecnico%20di%20Milano")))
-**Python Script for Fetching**
+[https://api.elsevier.com/content/search/scopus?query=(AFFIL('Università Bocconi') OR AFFIL('Università degli studi di Verona') OR AFFIL('Università Cattolica del Sacro Cuore') OR AFFIL('Università IULM Milano') OR AFFIL('Politecnico di Milano'))&"date"="2023-2026"&"view"="COMPLETE"](https://api.elsevier.com/content/search/scopus?query=PUBYEAR%20%3E%202023%20AND%20(AFFIL("Università%20Bocconi")%20OR%20AFFIL("Università%20degli%20studi%20di%20Verona")%20OR%20AFFIL("Università%20Cattolica%20del%20Sacro%20Cuore")%20OR%20AFFIL("Università%20IULM%20Milano")%20OR%20AFFIL("Politecnico%20di%20Milano"))&"date"="2023-2026"&"view"="COMPLETE")
+**Python Script for Fetching:**
 [Fetch Scopus Python File](harvest_scopus.py) fetches the Data from the GET API shown above.
 
 
 
 ### 2. Data Preparation
-CLean Data - Rows with Null values delete them
+Clean Data - Rows with Null values delete them
 
 
 ### 3. Geocode
@@ -63,9 +63,25 @@ CLean Data - Rows with Null values delete them
 
 
 
+# Basic Network Statistics
+- **Nodes: 5** - All GEN26 universities included
+- **Edges: 3** - distinct collaboration relationships between these universities
+- **Mean Degree: 1.2** - Average collaborations per university (6 total degrees ÷ 5 universities)
+- **Median Degree: 1** - Middle value when universities ranked by connections
+- **Total Weight: 118** - total collaborative publications across all partnerships
+- **Mean Weight: 39.33** - Each collaboration pair produces an average of ~39 joint papers
+- **Density: 0.3** - Only 30% of possible connections exist (3 out of 10)
+- **Isolated Nodes: 2** - Two universities with no collaborations
+
+| Dimension | Value | Interpretation |
+|----------------------|----------------------|----------------------|
+| **Scale**     | 5 nodes, 3 edges   | **Medium-sized consortium** with limited active connections |
+| **Connectivity**     | Mean: 1.2, Median: 1   | **Low connectivity** - most universities have 0-2 partners |
+| **Intensity**     | 39.33 papers/edge   | **Very high intensity** - existing collaborations are extremely productive |
+| **Density**     | 0.3 (30%)   | **Sparse network** - 70% of potential collaborations unrealized |
+
+
 # Results
-
-
 
 
 
