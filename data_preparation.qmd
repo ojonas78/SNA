@@ -1,0 +1,348 @@
+---
+title: "Data Preparation: Collaborative Papers from Italian Universities"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    number-sections: true
+execute:
+  echo: true
+  warning: false
+  message: true
+---
+
+# Overview
+
+This pipeline processes Scopus JSONL files from `data/raw` and filters for papers that show collaboration between at least two of the following Italian universities:
+
+-   Università Bocconi
+-   Università degli studi di Verona
+-   Università Cattolica del Sacro Cuore
+-   Università IULM Milano
+-   Politecnico di Milano
+
+## The filtered data is then stored in a SQLite database using the same structure as the original ingestion pipeline.
+
+### Packages
+
+```{r}
+library(jsonlite)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
+library(DBI)
+library(RSQLite)
+```
+
+### Paths
+
+```{r}
+RAW_DIR <- "data/raw"
+DB_PATH <- "data/db/scopus_papers.sqlite"
+
+# Create db directory if it doesn't exist
+if (!dir.exists(dirname(DB_PATH))) {
+  dir.create(dirname(DB_PATH), recursive = TRUE)
+}
+```
+
+### Target Universities
+
+```{r}
+TARGET_UNIVERSITIES <- c(
+  "Università Bocconi",
+  "Università degli studi di Verona",
+  "Università Cattolica del Sacro Cuore", 
+  "Università IULM Milano",
+  "Politecnico di Milano"
+)
+```
+
+### Small helpers
+
+```{r}
+.as_list_of_rows <- function(x) {
+  if (is.null(x)) return(list())
+  if (is.list(x) && !is.data.frame(x)) return(x)
+  if (is.data.frame(x)) return(unname(split(x, seq_len(nrow(x)))))
+  list()
+}
+
+`%||%` <- function(x, y) if (is.null(x)) y else x
+```
+
+### Collaboration Filter Function
+
+```{r}
+check_collaboration <- function(affils_df) {
+  if (nrow(affils_df) == 0) return(FALSE)
+
+  affil_names <- affils_df$affil
+  matches <- sum(TARGET_UNIVERSITIES %in% affil_names)
+
+  return(matches >= 2)
+}
+```
+
+### Tidy functions for one streamed chunk
+
+```{r}
+# Works (one row per record)
+works_from_chunk <- function(chunk) {
+  chunk %>%
+    transmute(
+      eid          = .data$eid,
+      title        = .data$`dc:title`,
+      doi          = .data$`prism:doi`,
+      cover_date   = .data$`prism:coverDate`,
+      cover_disp   = .data$`prism:coverDisplayDate`,
+      journal      = .data$`prism:publicationName`,
+      subtype      = .data$subtype,
+      subtype_desc = .data$subtypeDescription,
+      citedby      = suppressWarnings(as.integer(.data$`citedby-count`)),
+      year = suppressWarnings(as.integer(
+        str_extract(paste(cover_date %||% "", cover_disp %||% ""), "([12][0-9]{3})")
+      ))
+    )
+}
+
+# Authors (explode list -> long table)
+authors_from_chunk <- function(chunk) {
+  if (!"author" %in% names(chunk)) return(tibble())
+  chunk %>%
+    select(eid, author) %>%
+    mutate(author = map(author, .as_list_of_rows)) %>%
+    unnest_longer(author, keep_empty = FALSE) %>%
+    unnest_wider(author) %>%
+    mutate(
+      author_position = suppressWarnings(as.integer(
+        coalesce(
+          if ("seq"  %in% names(.)) .data$seq  else NULL,
+          if ("@seq" %in% names(.)) .data$`@seq` else NULL,
+          if ("order"%in% names(.)) .data$order else NULL
+        )
+      ))
+    ) %>%
+    transmute(
+      eid,
+      auth_id   = coalesce(!!!rlang::syms(intersect(names(.), c("authid","auth-id","author-id")))),
+      auth_name = coalesce(!!!rlang::syms(intersect(names(.), c("authname","author","name")))),
+      author_position,
+      orcid     = coalesce(!!!rlang::syms(intersect(names(.), c("orcid","orcid-id"))))
+    )
+}
+
+# Affiliations (explode list -> long table)
+affils_from_chunk <- function(chunk) {
+  if (!"affiliation" %in% names(chunk)) return(tibble())
+
+  to_rowlist <- function(x) {
+    if (is.null(x)) list()
+    else if (is.data.frame(x)) unname(split(x, seq_len(nrow(x))))
+    else if (is.list(x)) x
+    else list()
+  }
+  make_coal <- function(df, candidates) {
+    cand <- intersect(candidates, names(df))
+    if (!length(cand)) rep(NA_character_, nrow(df)) else dplyr::coalesce(!!!df[cand])
+  }
+
+  df <- chunk %>%
+    select(eid, affiliation) %>%
+    mutate(affiliation = map(affiliation, to_rowlist)) %>%
+    unnest_longer(affiliation, keep_empty = FALSE) %>%
+    unnest_wider(affiliation)
+
+  if (!nrow(df)) {
+    return(tibble(eid=character(), afid=character(), affil=character(), city=character(), country=character()))
+  }
+
+  df$afid    <- if ("afid" %in% names(df)) as.character(df$afid) else rep(NA_character_, nrow(df))
+  df$affil   <- make_coal(df, c("affilname","affiliation-name","affiliationName","affiliation"))
+  df$city    <- make_coal(df, c("affiliation-city","city"))
+  df$country <- make_coal(df, c("affiliation-country","country"))
+
+  df %>% transmute(eid, afid, affil, city, country) %>% distinct()
+}
+```
+
+### Database creation (SQLite)
+
+```{r}
+con <- dbConnect(RSQLite::SQLite(), DB_PATH)
+
+# Pragmas for durability vs speed balance
+dbExecute(con, "PRAGMA journal_mode=WAL;")
+dbExecute(con, "PRAGMA synchronous=NORMAL;")
+
+# Tables
+dbExecute(con, "
+  CREATE TABLE IF NOT EXISTS works (
+    eid TEXT PRIMARY KEY,
+    title TEXT, doi TEXT, cover_date TEXT, cover_disp TEXT,
+    journal TEXT, subtype TEXT, subtype_desc TEXT,
+    citedby INTEGER, year INTEGER
+  );
+")
+dbExecute(con, "
+  CREATE TABLE IF NOT EXISTS work_authors (
+    eid TEXT, auth_id TEXT, auth_name TEXT, author_position INTEGER, orcid TEXT
+  );
+")
+dbExecute(con, "
+  CREATE TABLE IF NOT EXISTS work_affiliations (
+    eid TEXT, afid TEXT, affil TEXT, city TEXT, country TEXT
+  );
+")
+
+# Indexes
+dbExecute(con, "CREATE UNIQUE INDEX IF NOT EXISTS uix_works_doi ON works(doi) WHERE doi IS NOT NULL;")
+dbExecute(con, "CREATE INDEX IF NOT EXISTS ix_auth_eid    ON work_authors(eid);")
+dbExecute(con, "CREATE INDEX IF NOT EXISTS ix_auth_authid ON work_authors(auth_id);")
+dbExecute(con, "CREATE INDEX IF NOT EXISTS ix_affil_eid   ON work_affiliations(eid);")
+dbExecute(con, "CREATE INDEX IF NOT EXISTS ix_affil_afid  ON work_affiliations(afid);")
+dbExecute(con, "CREATE INDEX IF NOT EXISTS ix_works_year  ON works(year);")
+```
+
+### Streamed ingestion with collaboration filtering
+
+```{r}
+ingest_scopus_file <- function(path, con, pagesize = 20000) {
+  message("→ Ingesting: ", basename(path))
+  conx <- if (endsWith(path, ".gz")) gzfile(path, "rt") else file(path, "rt")
+  on.exit(try(close(conx), silent = TRUE), add = TRUE)
+
+  repeat {
+    ch <- tryCatch(jsonlite::stream_in(conx, pagesize = pagesize, verbose = FALSE),
+                   error = function(e) NULL)
+    if (is.null(ch) || nrow(ch) == 0) break
+
+    # Extract tidy frames
+    w <- works_from_chunk(ch)
+    a <- authors_from_chunk(ch)
+    f <- affils_from_chunk(ch)
+
+    # Light hygiene
+    a <- a %>% filter(!is.na(eid) & nzchar(eid)) %>% distinct(eid, auth_id, author_position, .keep_all = TRUE)
+    f <- f %>% filter(!is.na(eid) & nzchar(eid)) %>% distinct(eid, afid, affil, city, country, .keep_all = TRUE)
+
+    dbBegin(con)
+    ok <- FALSE
+    tryCatch({
+      if (nrow(w)) {
+        # EID-based upsert
+        w_eid <- w %>% filter(!is.na(eid) & nzchar(eid))
+        if (nrow(w_eid)) {
+          dbWriteTable(con, "tmp_w", w_eid, temporary = TRUE, overwrite = TRUE)
+          dbExecute(con, "
+            INSERT OR REPLACE INTO works
+              (eid, title, doi, cover_date, cover_disp, journal, subtype, subtype_desc, citedby, year)
+            SELECT
+              n.eid,
+              COALESCE(n.title,        w.title),
+              COALESCE(n.doi,          w.doi),
+              COALESCE(n.cover_date,   w.cover_date),
+              COALESCE(n.cover_disp,   w.cover_disp),
+              COALESCE(n.journal,      w.journal),
+              COALESCE(n.subtype,      w.subtype),
+              COALESCE(n.subtype_desc, w.subtype_desc),
+              COALESCE(n.citedby,      w.citedby),
+              COALESCE(n.year,         w.year)
+            FROM tmp_w AS n
+            LEFT JOIN works AS w ON w.eid = n.eid;
+          ")
+          dbExecute(con, "DROP TABLE tmp_w;")
+        }
+
+        # DOI-only upsert (retain existing EID if DOI already present)
+        w_doi <- w %>% filter((is.na(eid) | !nzchar(eid)) & !is.na(doi) & nzchar(doi))
+        if (nrow(w_doi)) {
+          dbWriteTable(con, "tmp_wd", w_doi, temporary = TRUE, overwrite = TRUE)
+          dbExecute(con, "
+            INSERT OR REPLACE INTO works
+              (eid, title, doi, cover_date, cover_disp, journal, subtype, subtype_desc, citedby, year)
+            SELECT
+              COALESCE(w.eid, NULL),
+              COALESCE(n.title,        w.title),
+              COALESCE(n.doi,          w.doi),
+              COALESCE(n.cover_date,   w.cover_date),
+              COALESCE(n.cover_disp,   w.cover_disp),
+              COALESCE(n.journal,      w.journal),
+              COALESCE(n.subtype,      w.subtype),
+              COALESCE(n.subtype_desc, w.subtype_desc),
+              COALESCE(n.citedby,      w.citedby),
+              COALESCE(n.year,         w.year)
+            FROM tmp_wd AS n
+            LEFT JOIN works AS w ON w.doi = n.doi;
+          ")
+          dbExecute(con, "DROP TABLE tmp_wd;")
+        }
+      }
+
+      if (nrow(a)) dbAppendTable(con, "work_authors", a)
+      if (nrow(f)) dbAppendTable(con, "work_affiliations", f)
+
+      ok <- TRUE
+    }, error = function(e) {
+      message("  ! Page failed: ", conditionMessage(e))
+    }, finally = {
+      if (ok) dbCommit(con) else dbRollback(con)
+    })
+  }
+  invisible(TRUE)
+}
+
+ingest_scopus_folder <- function(folder, con, pattern="\\.jsonl(\\.gz)?$", pagesize=20000) {
+  files <- sort(dir(folder, pattern = pattern, full.names = TRUE))
+  for (i in seq_along(files)) {
+    message(sprintf("[%d/%d] %s", i, length(files), basename(files[i])))
+    try(ingest_scopus_file(files[i], con, pagesize = pagesize), silent = TRUE)
+  }
+  invisible(TRUE)
+}
+```
+
+### Run ingestion
+
+```{r}
+ingest_scopus_folder(RAW_DIR, con, pagesize = 20000)
+```
+
+### Sanity checks
+
+```{r}
+dbGetQuery(con, "SELECT COUNT(*) AS n_works FROM works;")
+dbGetQuery(con, "SELECT COUNT(*) AS n_authors FROM work_authors;")
+dbGetQuery(con, "SELECT COUNT(*) AS n_affils  FROM work_affiliations;")
+dbGetQuery(con, "SELECT year, COUNT(*) AS n FROM works GROUP BY 1 ORDER BY 1;")
+```
+
+```{r}
+f <- list.files(RAW_DIR, pattern="\\.jsonl(\\.gz)?$", full.names = TRUE)[1]
+
+conx  <- if (endsWith(f, ".gz")) gzfile(f, "rt") else file(f, "rt")
+chunk <- jsonlite::stream_in(conx, pagesize = 2000, verbose = FALSE); close(conx)
+
+w_preview  <- works_from_chunk(chunk);  head(w_preview, 3)
+a_preview  <- authors_from_chunk(chunk); head(a_preview, 3)
+f_preview  <- affils_from_chunk(chunk); head(f_preview, 3)
+```
+
+```{r}
+c_preview <- f_preview %>%
+  # Filter for target universities only
+  filter(affil %in% TARGET_UNIVERSITIES) %>%
+  # Group by eid and count distinct universities
+  group_by(eid) %>%
+  filter(n_distinct(affil) >= 2) %>%
+  ungroup() %>%
+  # Optional: add collaboration metadata
+  group_by(eid) %>%
+  mutate(
+    n_collab_unis = n_distinct(affil),
+    collab_unis = paste(sort(unique(affil)), collapse = " | ")
+  ) %>%
+  ungroup()
+```
