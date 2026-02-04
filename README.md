@@ -37,11 +37,25 @@ The GEN26 program has demonstrated remarkable reach since its launch:
 
 # Methology
 Demonstration of end-to-end course pipeline.
-### Fetching Scopus API Data
+### 1. Fetching Scopus API Data
 **GET API:**
 [https://api.elsevier.com/content/search/scopus?query=PUBYEAR > 2023 AND (AFFIL("Università Bocconi") OR AFFIL("Università degli studi di Verona") OR AFFIL("Università Cattolica del Sacro Cuore") OR AFFIL("Università IULM Milano") OR AFFIL("Politecnico di Milano"))](https://api.elsevier.com/content/search/scopus?query=PUBYEAR%20%3E%202023%20AND%20(AFFIL("Università%20Bocconi")%20OR%20AFFIL("Università%20degli%20studi%20di%20Verona")%20OR%20AFFIL("Università%20Cattolica%20del%20Sacro%20Cuore")%20OR%20AFFIL("Università%20IULM%20Milano")%20OR%20AFFIL("Politecnico%20di%20Milano")))
 **Python Script for Fetching**
 [Fetch Scopus Python File](harvest_scopus.py) fetches the Data from the GET API shown above.
+
+
+
+### 2. Data Preparation
+CLean Data - Rows with Null values delete them
+
+
+### 3. Geocode
+
+
+### 4. Create Network
+
+
+### 5. Weight Edges and Nodes
 
 
 

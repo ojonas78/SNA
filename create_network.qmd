@@ -1,0 +1,215 @@
+### Vis
+
+```{r}
+library(leaflet)
+
+data <- read.csv("c_preview_geocoded.csv", stringsAsFactors = FALSE)
+
+leaflet(data) %>%
+  addTiles() %>%
+  addMarkers(lng = ~longitude, 
+             lat = ~latitude,
+             popup = ~paste(affil, city, sep = ", "))
+```
+
+### Network
+
+```{r}
+library(tidyverse)
+library(igraph)
+
+# Remove rows with missing city/coordinates
+#df <- df %>% 
+#  filter(!is.na(city) & !is.na(latitude) & !is.na(longitude))
+
+# Create edge list: each row represents a connection between paper (eid) and city
+edges <- data %>%
+  select(eid, affil) %>%
+  distinct()
+
+# Create node attributes for cities
+city_nodes <- data %>%
+  group_by(affil) %>%
+  summarise(
+    afid = first(afid),
+    latitude = first(latitude),
+    longitude = first(longitude),
+    paper_count = n_distinct(eid),
+    .groups = "drop"
+  )
+
+# Create bipartite network (papers and cities)
+g <- graph_from_data_frame(edges, directed = FALSE, vertices = NULL)
+
+# Set node types (TRUE for cities, FALSE for papers)
+V(g)$type <- V(g)$name %in% city_nodes$affil
+
+# Add city attributes
+city_idx <- match(V(g)$name[V(g)$type], city_nodes$affil)
+V(g)$paper_count[V(g)$type] <- city_nodes$paper_count[city_idx]
+V(g)$affil[V(g)$type] <- city_nodes$affil[city_idx]
+
+# Visualize
+plot(g,
+     vertex.size = ifelse(V(g)$type, sqrt(V(g)$paper_count) * 2, 1),
+     vertex.color = ifelse(V(g)$type, "lightblue", "gray90"),
+     vertex.label = ifelse(V(g)$type, V(g)$name, NA),
+     vertex.label.cex = 0.7,
+     edge.color = "gray80",
+     layout = layout_with_fr(g))
+
+# Alternative: City-only projection (cities connected if they share papers)
+city_projection <- bipartite_projection(g, which = "true")
+
+plot(city_projection,
+     vertex.size = sqrt(V(city_projection)$paper_count),
+     vertex.label.cex = 0.8,
+     edge.width = E(city_projection)$weight / 10,
+     layout = layout_with_fr(city_projection))
+
+# Network statistics
+cat("Number of cities:", sum(V(g)$type), "\n")
+cat("Number of papers:", sum(!V(g)$type), "\n")
+cat("Network density:", edge_density(g), "\n")
+```
+
+```{r}
+# Load required libraries
+library(tidyverse)
+library(igraph)
+library(ggplot2)
+library(maps)
+library(ggraph)
+
+# Get unique university coordinates
+uni_coords <- data %>%
+  select(afid, latitude, longitude) %>%
+  distinct()
+
+# Create edge list: find universities that co-authored papers
+edges <- data %>%
+  group_by(eid) %>%
+  filter(n() > 1) %>%  # Only papers with multiple universities
+  arrange(afid) %>%
+  summarise(pairs = list(combn(afid, 2, simplify = FALSE))) %>%
+  unnest(pairs) %>%
+  mutate(from = map_int(pairs, 1),
+         to = map_int(pairs, 2)) %>%
+  select(from, to) %>%
+  group_by(from, to) %>%
+  summarise(weight = n(), .groups = "drop")
+
+# Create igraph object
+g <- graph_from_data_frame(edges, directed = FALSE, vertices = uni_coords)
+
+# Get world map
+world_map <- map_data("world")
+
+# Create visualization
+ggplot() +
+  # World map
+  geom_polygon(data = world_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray95", color = "gray70", size = 0.2) +
+  # Edges (connections between universities)
+  geom_segment(data = edges %>%
+                 left_join(uni_coords, by = c("from" = "afid")) %>%
+                 rename(lon_from = longitude, lat_from = latitude) %>%
+                 left_join(uni_coords, by = c("to" = "afid")) %>%
+                 rename(lon_to = longitude, lat_to = latitude),
+               aes(x = lon_from, y = lat_from, 
+                   xend = lon_to, yend = lat_to,
+                   alpha = weight, size = weight),
+               color = "blue") +
+  # Nodes (universities)
+  geom_point(data = uni_coords,
+             aes(x = longitude, y = latitude),
+             color = "red", size = 2, alpha = 0.7) +
+  # Styling
+  scale_alpha_continuous(range = c(0.1, 0.8)) +
+  scale_size_continuous(range = c(0.3, 2)) +
+  coord_fixed(1.3) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        legend.position = "bottom") +
+  labs(title = "University Collaboration Network",
+       subtitle = "Node = University, Edge = Co-authored Papers",
+       size = "Papers", alpha = "Papers")
+
+# Optional: Interactive version with curved edges
+library(geosphere)
+
+# Calculate great circle paths for curved edges
+edges_curved <- edges %>%
+  left_join(uni_coords, by = c("from" = "afid")) %>%
+  rename(lon_from = longitude, lat_from = latitude) %>%
+  left_join(uni_coords, by = c("to" = "afid")) %>%
+  rename(lon_to = longitude, lat_to = latitude) %>%
+  rowwise() %>%
+  mutate(path = list(gcIntermediate(c(lon_from, lat_from), 
+                                     c(lon_to, lat_to), 
+                                     n = 50, addStartEnd = TRUE))) %>%
+  unnest(path) %>%
+  rename(lon = `1`, lat = `2`)
+
+# Plot with curved edges
+ggplot() +
+  geom_polygon(data = world_map, 
+               aes(x = long, y = lat, group = group),
+               fill = "gray95", color = "gray70", size = 0.2) +
+  geom_path(data = edges_curved,
+            aes(x = lon, y = lat, group = interaction(from, to),
+                alpha = weight, size = weight),
+            color = "blue") +
+  geom_point(data = uni_coords,
+             aes(x = longitude, y = latitude),
+             color = "red", size = 2, alpha = 0.7) +
+  scale_alpha_continuous(range = c(0.1, 0.8)) +
+  scale_size_continuous(range = c(0.3, 2)) +
+  coord_fixed(1.3) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_blank()) +
+  labs(title = "University Collaboration Network (Curved Edges)")
+
+
+# Save edges with weights
+edges_export <- edges %>%
+  left_join(uni_coords, by = c("from" = "afid")) %>%
+  rename(from_afid = from,
+         from_lat = latitude, 
+         from_lon = longitude) %>%
+  left_join(uni_coords, by = c("to" = "afid")) %>%
+  rename(to_afid = to,
+         to_lat = latitude, 
+         to_lon = longitude)
+
+# Save nodes (universities)
+nodes_export <- uni_coords %>%
+  left_join(
+    data %>% 
+      group_by(afid) %>% 
+      summarise(total_papers = n_distinct(eid)),
+    by = "afid"
+  ) %>%
+  left_join(
+    edges %>% 
+      pivot_longer(cols = c(from, to), values_to = "afid") %>%
+      group_by(afid) %>%
+      summarise(total_collaborations = sum(weight)),
+    by = "afid"
+  ) %>%
+  replace_na(list(total_collaborations = 0))
+
+# Optional: Save a combined summary
+network_summary <- list(
+  total_universities = nrow(uni_coords),
+  total_papers = n_distinct(data$eid),
+  total_collaborations = nrow(edges),
+  total_collaborative_papers = sum(edges$weight)
+)
+
+```

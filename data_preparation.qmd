@@ -34,6 +34,8 @@ library(purrr)
 library(stringr)
 library(DBI)
 library(RSQLite)
+library(tidygeocoder)
+library(dplyr)
 ```
 
 ### Paths
@@ -319,6 +321,8 @@ dbGetQuery(con, "SELECT COUNT(*) AS n_affils  FROM work_affiliations;")
 dbGetQuery(con, "SELECT year, COUNT(*) AS n FROM works GROUP BY 1 ORDER BY 1;")
 ```
 
+### Get Works, Authors and Affilitations
+
 ```{r}
 f <- list.files(RAW_DIR, pattern="\\.jsonl(\\.gz)?$", full.names = TRUE)[1]
 
@@ -329,6 +333,8 @@ w_preview  <- works_from_chunk(chunk);  head(w_preview, 3)
 a_preview  <- authors_from_chunk(chunk); head(a_preview, 3)
 f_preview  <- affils_from_chunk(chunk); head(f_preview, 3)
 ```
+
+### Get Collaboration
 
 ```{r}
 c_preview <- f_preview %>%
@@ -345,4 +351,26 @@ c_preview <- f_preview %>%
     collab_unis = paste(sort(unique(affil)), collapse = " | ")
   ) %>%
   ungroup()
+```
+
+### Geocode
+
+```{r}
+# Create address column combining city and country
+c_preview <- c_preview %>%
+  mutate(address = paste(affil, city, country, sep = ", "))
+
+# Geocode to get latitude and longitude
+c_preview_geocoded <- c_preview %>%
+  geocode(address, method = "osm", lat = latitude, long = longitude)
+```
+
+### Save Data
+
+```{r}
+write.csv(w_preview, file="w_preview.csv", row.names = FALSE)
+write.csv(a_preview, file="a_preview.csv", row.names = FALSE)
+write.csv(f_preview, file="f_preview.csv", row.names = FALSE)
+write.csv(c_preview, file="c_preview.csv", row.names = FALSE)
+write.csv(c_preview_geocoded, file="c_preview_geocoded.csv", row.names = FALSE)
 ```
