@@ -1,5 +1,5 @@
 ---
-title: "Data Preparation: Collaborative Papers from Italian Universities"
+title: "Data Preparation: Collaborative Papers from GEN26 Universities"
 format:
   html:
     toc: true
@@ -22,7 +22,15 @@ This pipeline processes Scopus JSONL files from `data/raw` and filters for paper
 -   Università IULM Milano
 -   Politecnico di Milano
 
-## The filtered data is then stored in a SQLite database using the same structure as the original ingestion pipeline.
+The filtered data is then stored in a SQLite database using the same structure as the original ingestion pipeline.
+
+# Pipeline
+
+1.  Data Cleaning
+2.  Data Extraction
+3.  Collaboration Filtering
+4.  Geocoding
+5.  Save Data
 
 ### Packages
 
@@ -35,7 +43,6 @@ library(stringr)
 library(DBI)
 library(RSQLite)
 library(tidygeocoder)
-library(dplyr)
 ```
 
 ### Paths
@@ -73,19 +80,6 @@ TARGET_UNIVERSITIES <- c(
 }
 
 `%||%` <- function(x, y) if (is.null(x)) y else x
-```
-
-### Collaboration Filter Function
-
-```{r}
-check_collaboration <- function(affils_df) {
-  if (nrow(affils_df) == 0) return(FALSE)
-
-  affil_names <- affils_df$affil
-  matches <- sum(TARGET_UNIVERSITIES %in% affil_names)
-
-  return(matches >= 2)
-}
 ```
 
 ### Tidy functions for one streamed chunk
@@ -334,7 +328,7 @@ a_preview  <- authors_from_chunk(chunk); head(a_preview, 3)
 f_preview  <- affils_from_chunk(chunk); head(f_preview, 3)
 ```
 
-### Get Collaboration
+## Collaboration Filtering
 
 ```{r}
 c_preview <- f_preview %>%
@@ -353,7 +347,7 @@ c_preview <- f_preview %>%
   ungroup()
 ```
 
-### Geocode
+## Geocoding
 
 ```{r}
 # Create address column combining city and country
@@ -365,7 +359,7 @@ c_preview_geocoded <- c_preview %>%
   geocode(address, method = "osm", lat = latitude, long = longitude)
 ```
 
-### Save Data
+## Save Data
 
 ```{r}
 write.csv(w_preview, file="w_preview.csv", row.names = FALSE)

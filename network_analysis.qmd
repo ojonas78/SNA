@@ -12,17 +12,36 @@ execute:
   message: true
 ---
 
-### Basic Network Statistics
+# Overview
+
+This pipeline provides a Network Analysis of the GEN26 universities.
+
+# Pipeline
+
+1.  Basic Network Statistics
+2.  Borgatti-Everett Core-Periphery Model
+3.  Bar Chart
+4.  Export for QGIS
+
+## Basic Network Statistics
+
+### Packages
 
 ```{r}
 library(dplyr)
 library(igraph)
 library(tidyr)
+```
 
-c_preview <- read.csv("c_preview.csv", stringsAsFactors = FALSE)
+### Read CSV
+
+```{r}
 c_preview_geocoded <- read.csv("c_preview_geocoded.csv", stringsAsFactors = FALSE)
+```
 
+### Define Target Universities
 
+```{r}
 # Define all 5 GEN26 universities from your data
 TARGET_UNIVERSITIES <- c(
   "Università Bocconi",
@@ -31,15 +50,19 @@ TARGET_UNIVERSITIES <- c(
   "Università IULM Milano",
   "Politecnico di Milano"
 )
+```
 
+### Calculate Full Network Statistics
+
+```{r}
 # Calculate Full Network Statistics (All 5 Universities)
-calculate_full_network_stats <- function(c_preview, all_universities) {
+calculate_full_network_stats <- function(c_preview_geocoded, all_universities) {
 
   # 1. NODES: All 5 universities (including isolated ones)
   nodes <- length(all_universities)
 
-  # 2. Create collaboration pairs from c_preview
-  collab_pairs <- c_preview %>%
+  # 2. Create collaboration pairs from c_preview_geocoded
+  collab_pairs <- c_preview_geocoded %>%
     select(eid, affil) %>%
     distinct() %>%
     # Create all pairwise combinations within each publication
@@ -108,8 +131,12 @@ calculate_full_network_stats <- function(c_preview, all_universities) {
 }
 
 # Calculate the full network statistics
-full_stats <- calculate_full_network_stats(c_preview, TARGET_UNIVERSITIES)
+full_stats <- calculate_full_network_stats(c_preview_geocoded, TARGET_UNIVERSITIES)
+```
 
+### Display results
+
+```{r}
 # Display results
 cat("=== FULL GEN26 NETWORK STATISTICS ===\n")
 cat("Nodes (Universities):", full_stats$nodes, "\n")
@@ -152,7 +179,9 @@ degree_table <- data.frame(
 print(degree_table)
 ```
 
-### **Borgatti-Everett Core-Periphery Model**
+## **Borgatti-Everett Core-Periphery Model**
+
+### Packages
 
 ```{r}
 library(netUtils)
@@ -162,7 +191,17 @@ library(GA)
 library(ggplot2)
 library(maps)
 library(geosphere)
+```
 
+### Read CSV
+
+```{r}
+c_preview_geocoded <- read.csv("c_preview_geocoded.csv", stringsAsFactors = FALSE)
+```
+
+### Define Target Universities
+
+```{r}
 # Define all 5 GEN26 universities
 TARGET_UNIVERSITIES <- c(
   "Università Bocconi",
@@ -171,7 +210,11 @@ TARGET_UNIVERSITIES <- c(
   "Università IULM Milano",
   "Politecnico di Milano"
 )
+```
 
+### Create igraph Network
+
+```{r}
 # Function to create igraph network from c_preview_geocoded data
 create_gen26_network <- function(c_preview_geocoded, all_universities) {
 
@@ -231,7 +274,11 @@ create_gen26_network <- function(c_preview_geocoded, all_universities) {
 # Create the network
 gen26_data <- create_gen26_network(c_preview_geocoded, TARGET_UNIVERSITIES)
 gen26_network <- gen26_data$graph
+```
 
+### Borgatti-Everett Core-Periphery Model
+
+```{r}
 # Apply Borgatti-Everett Core-Periphery Model
 borgatti_everett_analysis <- function(network) {
 
@@ -304,8 +351,49 @@ borgatti_everett_analysis <- function(network) {
 
 # Run the analysis
 cp_results <- borgatti_everett_analysis(gen26_network)
+```
 
-# FIXED MAP 1: Edges and Weights Visualization
+### Visualize - Borgatti-Everett Core-Periphery Model
+
+```{r}
+# Original network visualization
+visualize_core_periphery <- function(network, cp_result) {
+
+  # Set node colors based on core-periphery assignment
+  node_colors <- ifelse(cp_result$consensus$Consensus_Role == "CORE", "red", "lightblue")
+  node_sizes <- ifelse(cp_result$consensus$Consensus_Role == "CORE", 20, 15)
+
+  # Plot network
+  plot(network,
+       vertex.color = node_colors,
+       vertex.size = node_sizes,
+       vertex.label = V(network)$name,
+       vertex.label.cex = 0.8,
+       vertex.label.color = "black",
+       edge.width = 2,
+       edge.color = "gray",
+       layout = layout_with_fr(network),
+       main = "GEN26 Universities: Core-Periphery Structure\n(Red = Core, Blue = Periphery)")
+
+  # Add legend
+  legend("topright", 
+         legend = c("Core", "Periphery"), 
+         col = c("red", "lightblue"), 
+         pch = 19, 
+         cex = 0.8)
+}
+
+# Create all visualizations
+cat("\n=== CREATING VISUALIZATIONS ===\n")
+
+# 1. Original core-periphery network plot
+visualize_core_periphery(gen26_network, cp_results)
+```
+
+### Visualize - Edges and Weight Map
+
+```{r}
+# FIXED MAP 1: Edges and Weights Visualization with Coordinate Reference System
 create_edges_map <- function(gen26_data, cp_results) {
 
   # Check if we have edges to plot
@@ -319,10 +407,13 @@ create_edges_map <- function(gen26_data, cp_results) {
       geom_text(data = gen26_data$uni_coords,
                 aes(x = longitude, y = latitude, label = affil),
                 vjust = -0.5, hjust = 0.5, size = 3, fontface = "bold") +
+      scale_x_continuous(name = "Longitude") +
+      scale_y_continuous(name = "Latitude") +
       theme_minimal() +
-      theme(axis.title = element_blank(),
-            axis.text = element_blank(),
-            panel.grid = element_blank()) +
+      theme(axis.title = element_text(size = 10, face = "bold"),
+            axis.text = element_text(size = 9),
+            panel.grid.major = element_line(color = "gray90"),
+            panel.grid.minor = element_line(color = "gray95")) +
       labs(title = "GEN26 Universities - No Collaborations Found",
            subtitle = "Red dots represent university locations")
 
@@ -360,7 +451,7 @@ create_edges_map <- function(gen26_data, cp_results) {
       select(-lat1, -lon1, -lat2, -lon2) %>%
       unnest(path_data)
 
-    # Plot edges map with discrete colors
+    # Plot edges map with discrete colors and coordinate system
     ggplot() +
       geom_path(data = edges_curved,
                 aes(x = lon, y = lat, 
@@ -373,57 +464,29 @@ create_edges_map <- function(gen26_data, cp_results) {
       geom_text(data = gen26_data$uni_coords,
                 aes(x = longitude, y = latitude, label = affil),
                 vjust = -0.5, hjust = 0.5, size = 3, fontface = "bold") +
+      scale_x_continuous(name = "Longitude") +
+      scale_y_continuous(name = "Latitude") +
       scale_color_brewer(palette = "Blues", direction = 1, 
                          name = "Collaborations") +
       scale_size_continuous(range = c(1, 4), guide = "none") +
       theme_minimal() +
-      theme(axis.title = element_blank(),
-            axis.text = element_blank(),
-            panel.grid = element_blank()) +
+      theme(axis.title = element_text(size = 10, face = "bold"),
+            axis.text = element_text(size = 9),
+            panel.grid.major = element_line(color = "gray90"),
+            panel.grid.minor = element_line(color = "gray95")) +
       labs(title = "GEN26 University Collaboration Network - Edges and Weights",
            subtitle = "Edge thickness and color represent collaboration intensity")
   }
 }
 
-
-# Original network visualization
-visualize_core_periphery <- function(network, cp_result) {
-
-  # Set node colors based on core-periphery assignment
-  node_colors <- ifelse(cp_result$consensus$Consensus_Role == "CORE", "red", "lightblue")
-  node_sizes <- ifelse(cp_result$consensus$Consensus_Role == "CORE", 20, 15)
-
-  # Plot network
-  plot(network,
-       vertex.color = node_colors,
-       vertex.size = node_sizes,
-       vertex.label = V(network)$name,
-       vertex.label.cex = 0.8,
-       vertex.label.color = "black",
-       edge.width = 2,
-       edge.color = "gray",
-       layout = layout_with_fr(network),
-       main = "GEN26 Universities: Core-Periphery Structure\n(Red = Core, Blue = Periphery)")
-
-  # Add legend
-  legend("topright", 
-         legend = c("Core", "Periphery"), 
-         col = c("red", "lightblue"), 
-         pch = 19, 
-         cex = 0.8)
-}
-
-# Create all visualizations
-cat("\n=== CREATING VISUALIZATIONS ===\n")
-
-# 1. Original core-periphery network plot
-visualize_core_periphery(gen26_network, cp_results)
-
 # 2. Edges and weights map
 edges_map <- create_edges_map(gen26_data, cp_results)
 print(edges_map)
+```
 
+### Display results
 
+```{r}
 # Export summary data
 network_summary <- list(
   total_universities = length(TARGET_UNIVERSITIES),
@@ -435,193 +498,9 @@ network_summary <- list(
 
 cat("\n=== NETWORK SUMMARY ===\n")
 print(network_summary)
-
 ```
 
-### Network figure visualized
-
-```{r}
-library(igraph)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(maps)
-library(tidygeocoder)
-
-# Load data
-c_preview <- read.csv("c_preview_geocoded.csv", stringsAsFactors = FALSE)
-c_preview_geocoded <- read.csv("c_preview_geocoded.csv", stringsAsFactors = FALSE)
-
-# Definieren Sie die Ziel-Universitäten
-TARGET_UNIVERSITIES <- c(
-  "Università Bocconi",
-  "Università degli studi di Verona", 
-  "Università Cattolica del Sacro Cuore",
-  "Università IULM Milano",
-  "Politecnico di Milano"
-)
-
-# Filtern Sie c_preview VOR der Paar-Erstellung
-c_preview_filtered <- c_preview %>%
-  filter(affil %in% TARGET_UNIVERSITIES)
-
-# Dann erstellen Sie die Kollaborationspaare
-collab_pairs <- c_preview_filtered %>%
-  select(eid, affil) %>%
-  distinct() %>%
-  group_by(eid) %>%
-  do({
-    unis <- .$affil
-    if(length(unis) >= 2) {
-      expand.grid(uni1 = unis, uni2 = unis, stringsAsFactors = FALSE) %>%
-        filter(uni1 < uni2)
-    } else {
-      data.frame(uni1 = character(0), uni2 = character(0))
-    }
-  }) %>%
-  ungroup()
-
-# Count collaboration weights
-edge_weights <- collab_pairs %>%
-  count(uni1, uni2, name = "weight")
-
-# Extract universities that actually have collaborations
-active_universities <- unique(c(edge_weights$uni1, edge_weights$uni2))
-
-# Identify missing universities from geocoded data
-existing_unis <- c_preview_geocoded$affil
-missing_unis <- setdiff(active_universities, existing_unis)
-
-# Geocode missing universities using OSM
-if(length(missing_unis) > 0) {
-  cat("Geocoding missing universities:", paste(missing_unis, collapse = ", "), "\n")
-
-  missing_df <- data.frame(affil = missing_unis, stringsAsFactors = FALSE)
-
-  geocoded_missing <- missing_df %>%
-    geocode(address = affil, method = "osm", lat = latitude, long = longitude)
-
-  # Merge with existing geocoded data
-  c_preview_geocoded <- c_preview_geocoded %>%
-    bind_rows(geocoded_missing) %>%
-    distinct(affil, .keep_all = TRUE)
-
-  cat("Geocoding complete!\n")
-  print(geocoded_missing)
-}
-
-# Get coordinates only for universities with collaborations
-uni_coords <- c_preview_geocoded %>%
-  select(affil, latitude, longitude) %>%
-  distinct() %>%
-  filter(affil %in% active_universities)
-
-# Create igraph with only active universities
-g <- make_empty_graph(n = 0, directed = FALSE)
-g <- add_vertices(g, length(active_universities), name = active_universities)
-
-# Add coordinates as vertex attributes
-for(i in 1:length(active_universities)) {
-  uni_name <- active_universities[i]
-  coords <- uni_coords[uni_coords$affil == uni_name, ]
-  if(nrow(coords) > 0) {
-    V(g)[uni_name]$latitude <- coords$latitude[1]
-    V(g)[uni_name]$longitude <- coords$longitude[1]
-  }
-}
-
-# Add edges
-if(nrow(edge_weights) > 0) {
-  edge_list <- as.matrix(edge_weights[, c("uni1", "uni2")])
-  g <- add_edges(g, t(edge_list))
-  E(g)$weight <- edge_weights$weight
-}
-
-# Create map-based visualization
-create_map_network <- function(graph, uni_coords) {
-
-  # Get map boundaries with padding
-  lat_range <- range(uni_coords$latitude, na.rm = TRUE)
-  lon_range <- range(uni_coords$longitude, na.rm = TRUE)
-  lat_pad <- diff(lat_range) * 0.3
-  lon_pad <- diff(lon_range) * 0.3
-
-  # Get world map data
-  world_map <- map_data("world")
-
-  # Filter map for Italian region
-  region_countries <- c("Italy", "Switzerland", "Austria", "France", "Slovenia", "Croatia")
-  region_map <- world_map %>%
-    filter(region %in% region_countries)
-
-  # Prepare edge data
-  edge_data <- data.frame()
-  if(ecount(graph) > 0) {
-    for(i in 1:ecount(graph)) {
-      edge <- ends(graph, i)
-      v1 <- edge[1]
-      v2 <- edge[2]
-      edge_data <- rbind(edge_data, data.frame(
-        x = V(graph)[v1]$longitude,
-        y = V(graph)[v1]$latitude,
-        xend = V(graph)[v2]$longitude,
-        yend = V(graph)[v2]$latitude,
-        weight = E(graph)$weight[i]
-      ))
-    }
-  }
-
-  # Create plot
-  p <- ggplot() +
-    geom_polygon(data = region_map, 
-                 aes(x = long, y = lat, group = group),
-                 fill = "gray90", color = "white", linewidth = 0.3) +
-    {if(nrow(edge_data) > 0) {
-      geom_segment(data = edge_data,
-                   aes(x = x, y = y, xend = xend, yend = yend, 
-                       linewidth = weight, alpha = weight),
-                   color = "blue")
-    }} +
-    geom_point(data = uni_coords,
-               aes(x = longitude, y = latitude),
-               color = "red", size = 5, alpha = 0.8) +
-    geom_text(data = uni_coords,
-              aes(x = longitude, y = latitude, label = affil),
-              vjust = -0.8, size = 3, fontface = "bold") +
-    scale_linewidth_continuous(range = c(0.5, 3), name = "Collaborations") +
-    scale_alpha_continuous(range = c(0.3, 1.0), guide = "none") +
-    coord_fixed(1.3, 
-                xlim = c(lon_range[1] - lon_pad, lon_range[2] + lon_pad),
-                ylim = c(lat_range[1] - lat_pad, lat_range[2] + lat_pad)) +
-    theme_minimal() +
-    theme(panel.grid.major = element_line(color = "gray95", linewidth = 0.2),
-          panel.background = element_rect(fill = "aliceblue"),
-          axis.title = element_blank()) +
-    labs(title = "GEN26 University Collaboration Network",
-         subtitle = "Universities with active collaborations | Edge thickness = collaboration weight")
-
-  return(p)
-}
-
-# Generate visualization
-map_plot <- create_map_network(g, uni_coords)
-print(map_plot)
-
-# Network summary
-cat("\nNetwork Summary:\n")
-cat("Total universities in network:", vcount(g), "\n")
-cat("Active collaborations:", ecount(g), "\n")
-if(ecount(g) > 0) {
-  cat("Total collaborative papers:", sum(E(g)$weight), "\n")
-}
-
-cat("\nUniversities in Network:\n")
-print(uni_coords)
-
-
-```
-
-### Bar Chart
+## Bar Chart
 
 ```{r}
 library(ggplot2)
@@ -629,7 +508,7 @@ library(dplyr)
 library(igraph)
 
 # Create edge list from collaboration data
-collab_pairs <- c_preview %>%
+collab_pairs <- c_preview_geocoded %>%
   select(eid, affil) %>%
   distinct() %>%
   group_by(eid) %>%
@@ -685,128 +564,10 @@ ggplot(node_data, aes(x = reorder(University, Degree), y = Degree)) +
 
 ```
 
-### Export for Gephi
+# Export for QGIS
 
 ```{r}
-# Complete Gephi Export Code for GEN26 Network
-library(dplyr)
-
-# Function to create Gephi-ready files
-export_gephi_files <- function(gen26_data, cp_results, output_dir = "gephi_export") {
-
-  # Create output directory
-  if (!dir.exists(output_dir)) {
-    dir.create(output_dir)
-  }
-
-  # 1. CREATE NODES FILE
-  # Gephi requires: Id, Label columns (minimum)
-  # Additional columns become node attributes
-
-  nodes_data <- gen26_data$uni_coords %>%
-    left_join(cp_results$consensus, by = c("affil" = "University")) %>%
-    mutate(
-      # Required columns for Gephi
-      Id = affil,  # Unique identifier
-      Label = affil,  # Display name
-
-      # Core-Periphery attributes
-      Consensus_Role = ifelse(is.na(Consensus_Role), "PERIPHERY", Consensus_Role),
-      Core_Votes = ifelse(is.na(Core_Votes), 0, Core_Votes),
-
-      # Geographic attributes
-      Latitude = latitude,
-      Longitude = longitude,
-
-      # Network attributes (calculate from edges)
-      Degree = 0,  # Will be calculated by Gephi
-
-      # Visual attributes for Gephi
-      Role_Numeric = ifelse(Consensus_Role == "CORE", 1, 0),
-      Node_Size = ifelse(Consensus_Role == "CORE", 20, 15)
-    ) %>%
-    select(Id, Label, Consensus_Role, Core_Votes, Latitude, Longitude, 
-           Role_Numeric, Node_Size)
-
-  # Add degree calculations from your network data
-  degree_counts <- gen26_data$edge_weights %>%
-    pivot_longer(cols = c(uni1, uni2), names_to = "position", values_to = "university") %>%
-    group_by(university) %>%
-    summarise(Degree = n(), .groups = "drop")
-
-  # Merge degree counts
-  nodes_data <- nodes_data %>%
-    left_join(degree_counts, by = c("Id" = "university")) %>%
-    mutate(Degree = ifelse(is.na(Degree), 0, Degree))
-
-  # 2. CREATE EDGES FILE  
-  # Gephi requires: Source, Target columns (minimum)
-  # Additional columns become edge attributes
-
-  edges_data <- gen26_data$edge_weights %>%
-    mutate(
-      # Required columns for Gephi
-      Source = uni1,
-      Target = uni2,
-
-      # Edge attributes
-      Weight = weight,
-      Type = "Undirected",  # Specify edge type
-
-      # Visual attributes
-      Edge_Color = "blue",
-      Edge_Thickness = weight * 2
-    ) %>%
-    select(Source, Target, Weight, Type, Edge_Color, Edge_Thickness)
-
-  # 3. EXPORT FILES
-
-  # Export nodes (CSV format required by Gephi)
-  nodes_file <- file.path(output_dir, "gen26_nodes.csv")
-  write.csv(nodes_data, nodes_file, row.names = FALSE, quote = TRUE)
-
-  # Export edges (CSV format required by Gephi)
-  edges_file <- file.path(output_dir, "gen26_edges.csv")
-  write.csv(edges_data, edges_file, row.names = FALSE, quote = TRUE)
-
-  # 4. CREATE SUMMARY REPORT
-  summary_report <- list(
-    total_nodes = nrow(nodes_data),
-    total_edges = nrow(edges_data),
-    core_universities = sum(nodes_data$Consensus_Role == "CORE"),
-    periphery_universities = sum(nodes_data$Consensus_Role == "PERIPHERY"),
-    total_collaborations = sum(edges_data$Weight),
-    files_created = c(nodes_file, edges_file)
-  )
-
-  # Print summary
-  cat("=== GEPHI EXPORT SUMMARY ===\n")
-  cat("Nodes file:", nodes_file, "\n")
-  cat("Edges file:", edges_file, "\n")
-  cat("Total nodes:", summary_report$total_nodes, "\n")
-  cat("Total edges:", summary_report$total_edges, "\n")
-  cat("Core universities:", summary_report$core_universities, "\n")
-  cat("Periphery universities:", summary_report$periphery_universities, "\n")
-  cat("Total collaborations:", summary_report$total_collaborations, "\n\n")
-
-  # Show first few rows
-  cat("NODES FILE PREVIEW:\n")
-  print(head(nodes_data, 3))
-  cat("\nEDGES FILE PREVIEW:\n")
-  print(head(edges_data, 3))
-
-  return(summary_report)
-}
-
-# Execute the export
-gephi_export <- export_gephi_files(gen26_data, cp_results)
-
-```
-
-### Export for QGIS
-
-```{r}
-# Complete QGIS Export Code for GEN26 Network
+# QGIS Export Code for GEN26 Network - Shapefiles and CSV only
 library(dplyr)
 library(sf)
 
@@ -815,38 +576,31 @@ export_qgis_network_files <- function(gen26_data, cp_results, output_dir = "qgis
 
   # Create output directory
   if (!dir.exists(output_dir)) {
-    dir.create(output_dir)
+    dir.create(output_dir, recursive = TRUE)
   }
 
   # 1. CREATE NODES SHAPEFILE
-  # Prepare node data with all attributes
   nodes_data <- gen26_data$uni_coords %>%
     left_join(cp_results$consensus, by = c("affil" = "University")) %>%
     mutate(
-      # University identifiers
       uni_id = row_number(),
       uni_name = affil,
-
-      # Core-Periphery attributes
       cp_role = ifelse(is.na(Consensus_Role), "PERIPHERY", Consensus_Role),
       core_votes = ifelse(is.na(Core_Votes), 0, Core_Votes),
-
-      # Visual attributes for QGIS styling
       node_size = ifelse(cp_role == "CORE", 8, 5),
       node_color = ifelse(cp_role == "CORE", "red", "blue")
     ) %>%
     select(uni_id, uni_name, cp_role, core_votes, node_size, node_color, latitude, longitude)
 
-  # Convert to sf object and export as shapefile
+  # Convert to sf object (POINT geometry)
   nodes_sf <- st_as_sf(nodes_data, 
                        coords = c("longitude", "latitude"), 
                        crs = 4326)
 
   nodes_file <- file.path(output_dir, "gen26_universities.shp")
-  st_write(nodes_sf, nodes_file, delete_dsn = TRUE)
+  st_write(nodes_sf, nodes_file, delete_dsn = TRUE, quiet = TRUE)
 
-  # 2. CREATE EDGES SHAPEFILE
-  # Prepare edge data with coordinates
+  # 2. CREATE EDGES SHAPEFILE (LINESTRING geometry)
   if(nrow(gen26_data$edge_weights) > 0) {
     edges_with_coords <- gen26_data$edge_weights %>%
       left_join(gen26_data$uni_coords, by = c("uni1" = "affil")) %>%
@@ -855,43 +609,38 @@ export_qgis_network_files <- function(gen26_data, cp_results, output_dir = "qgis
       rename(lat2 = latitude, lon2 = longitude) %>%
       mutate(
         edge_id = row_number(),
-        collab_weight = weight,
-        line_width = weight * 0.5,  # Scale for QGIS styling
-        edge_label = paste0(uni1, " ↔ ", uni2, " (", weight, " papers)")
+        collab_wt = weight,
+        line_width = weight * 0.5
       )
 
-    # Create line geometries
-    edges_list <- list()
-    for(i in 1:nrow(edges_with_coords)) {
+    # Create LINESTRING geometries
+    edges_geom <- lapply(1:nrow(edges_with_coords), function(i) {
       edge <- edges_with_coords[i, ]
-      line_coords <- matrix(c(edge$lon1, edge$lat1, edge$lon2, edge$lat2), 
-                           ncol = 2, byrow = TRUE)
-      edges_list[[i]] <- st_linestring(line_coords)
-    }
+      st_linestring(matrix(c(edge$lon1, edge$lat1, edge$lon2, edge$lat2), 
+                          ncol = 2, byrow = TRUE))
+    })
 
     # Create sf object for edges
     edges_sf <- st_sf(
       edge_id = edges_with_coords$edge_id,
       uni1 = edges_with_coords$uni1,
       uni2 = edges_with_coords$uni2,
-      weight = edges_with_coords$collab_weight,
+      weight = edges_with_coords$collab_wt,
       line_width = edges_with_coords$line_width,
-      edge_label = edges_with_coords$edge_label,
-      geometry = st_sfc(edges_list, crs = 4326)
+      geometry = st_sfc(edges_geom, crs = 4326)
     )
 
     edges_file <- file.path(output_dir, "gen26_collaborations.shp")
-    st_write(edges_sf, edges_file, delete_dsn = TRUE)
+    st_write(edges_sf, edges_file, delete_dsn = TRUE, quiet = TRUE)
   } else {
-    edges_file <- "No collaborations to export"
+    edges_file <- NULL
+    cat("Warning: No collaborations to export\n")
   }
 
-  # 3. CREATE CSV FILES (Alternative format)
-  # Nodes CSV
+  # 3. CREATE CSV FILES
   nodes_csv <- file.path(output_dir, "universities_coordinates.csv")
   write.csv(nodes_data, nodes_csv, row.names = FALSE)
 
-  # Edges CSV (for hub lines tool)
   if(nrow(gen26_data$edge_weights) > 0) {
     edges_csv_data <- gen26_data$edge_weights %>%
       left_join(gen26_data$uni_coords, by = c("uni1" = "affil")) %>%
@@ -902,26 +651,152 @@ export_qgis_network_files <- function(gen26_data, cp_results, output_dir = "qgis
 
     edges_csv <- file.path(output_dir, "collaborations_coordinates.csv")
     write.csv(edges_csv_data, edges_csv, row.names = FALSE)
+  } else {
+    edges_csv <- NULL
   }
 
   # Print summary
-  cat("=== QGIS EXPORT SUMMARY ===\n")
-  cat("Nodes shapefile:", nodes_file, "\n")
-  cat("Edges shapefile:", edges_file, "\n")
-  cat("Nodes CSV:", nodes_csv, "\n")
-  if(exists("edges_csv")) cat("Edges CSV:", edges_csv, "\n")
-  cat("Total universities:", nrow(nodes_data), "\n")
-  cat("Total collaborations:", nrow(gen26_data$edge_weights), "\n\n")
+  cat("\n=== QGIS EXPORT SUMMARY ===\n")
+  cat("Output directory:", normalizePath(output_dir), "\n\n")
+  cat("Shapefiles:\n")
+  cat("  - Nodes:", basename(nodes_file), "\n")
+  if(!is.null(edges_file)) cat("  - Edges:", basename(edges_file), "\n")
+  cat("\nCSV files:\n")
+  cat("  - Nodes:", basename(nodes_csv), "\n")
+  if(!is.null(edges_csv)) cat("  - Edges:", basename(edges_csv), "\n")
+  cat("\nData summary:\n")
+  cat("  - Total universities:", nrow(nodes_data), "\n")
+  cat("  - Total collaborations:", nrow(gen26_data$edge_weights), "\n")
+  cat("  - Core universities:", sum(nodes_data$cp_role == "CORE"), "\n")
+  cat("  - Periphery universities:", sum(nodes_data$cp_role == "PERIPHERY"), "\n\n")
 
   return(list(
     nodes_shp = nodes_file,
     edges_shp = edges_file,
     nodes_csv = nodes_csv,
-    edges_csv = if(exists("edges_csv")) edges_csv else NULL
+    edges_csv = edges_csv,
+    output_dir = normalizePath(output_dir)
   ))
 }
 
 # Execute the export
 qgis_files <- export_qgis_network_files(gen26_data, cp_results)
 
+```
+
+```{r}
+# QGIS Export Code for GEN26 Network - Shapefiles and CSV only
+library(dplyr)
+library(sf)
+
+# Function to create QGIS-ready files
+export_qgis_network_files <- function(gen26_data, cp_results, output_dir = "qgis_export") {
+
+  # Create output directory
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+
+  # 1. CREATE NODES SHAPEFILE
+  nodes_data <- gen26_data$uni_coords %>%
+    left_join(cp_results$consensus, by = c("affil" = "University")) %>%
+    mutate(
+      uni_id = row_number(),
+      uni_name = affil,
+      cp_role = ifelse(is.na(Consensus_Role), "PERIPHERY", Consensus_Role),
+      core_votes = ifelse(is.na(Core_Votes), 0, Core_Votes),
+      node_size = ifelse(cp_role == "CORE", 8, 5),
+      node_color = ifelse(cp_role == "CORE", "red", "blue")
+    ) %>%
+    select(uni_id, uni_name, cp_role, core_votes, node_size, node_color, latitude, longitude)
+
+  # Convert to sf object (POINT geometry)
+  nodes_sf <- st_as_sf(nodes_data, 
+                       coords = c("longitude", "latitude"), 
+                       crs = 4326)
+
+  nodes_file <- file.path(output_dir, "gen26_universities.shp")
+  st_write(nodes_sf, nodes_file, delete_dsn = TRUE, quiet = TRUE)
+
+  # 2. CREATE EDGES SHAPEFILE (LINESTRING geometry)
+  if(nrow(gen26_data$edge_weights) > 0) {
+    edges_with_coords <- gen26_data$edge_weights %>%
+      left_join(gen26_data$uni_coords, by = c("uni1" = "affil")) %>%
+      rename(lat1 = latitude, lon1 = longitude) %>%
+      left_join(gen26_data$uni_coords, by = c("uni2" = "affil")) %>%
+      rename(lat2 = latitude, lon2 = longitude) %>%
+      mutate(
+        edge_id = row_number(),
+        collab_wt = weight,
+        line_width = weight * 0.5
+      )
+
+    # Create LINESTRING geometries
+    edges_geom <- lapply(1:nrow(edges_with_coords), function(i) {
+      edge <- edges_with_coords[i, ]
+      st_linestring(matrix(c(edge$lon1, edge$lat1, edge$lon2, edge$lat2), 
+                          ncol = 2, byrow = TRUE))
+    })
+
+    # Create sf object for edges
+    edges_sf <- st_sf(
+      edge_id = edges_with_coords$edge_id,
+      uni1 = edges_with_coords$uni1,
+      uni2 = edges_with_coords$uni2,
+      weight = edges_with_coords$collab_wt,
+      line_width = edges_with_coords$line_width,
+      geometry = st_sfc(edges_geom, crs = 4326)
+    )
+
+    edges_file <- file.path(output_dir, "gen26_collaborations.shp")
+    st_write(edges_sf, edges_file, delete_dsn = TRUE, quiet = TRUE)
+  } else {
+    edges_file <- NULL
+    cat("Warning: No collaborations to export\n")
+  }
+
+  # 3. CREATE CSV FILES
+  nodes_csv <- file.path(output_dir, "universities_coordinates.csv")
+  write.csv(nodes_data, nodes_csv, row.names = FALSE)
+
+  if(nrow(gen26_data$edge_weights) > 0) {
+    edges_csv_data <- gen26_data$edge_weights %>%
+      left_join(gen26_data$uni_coords, by = c("uni1" = "affil")) %>%
+      rename(hub_lat = latitude, hub_lon = longitude, hub_name = uni1) %>%
+      left_join(gen26_data$uni_coords, by = c("uni2" = "affil")) %>%
+      rename(spoke_lat = latitude, spoke_lon = longitude, spoke_name = uni2) %>%
+      select(hub_name, hub_lat, hub_lon, spoke_name, spoke_lat, spoke_lon, weight)
+
+    edges_csv <- file.path(output_dir, "collaborations_coordinates.csv")
+    write.csv(edges_csv_data, edges_csv, row.names = FALSE)
+  } else {
+    edges_csv <- NULL
+  }
+
+  # Print summary
+  cat("\n=== QGIS EXPORT SUMMARY ===\n")
+  cat("Output directory:", normalizePath(output_dir), "\n\n")
+  cat("Shapefiles:\n")
+  cat("  - Nodes:", basename(nodes_file), "\n")
+  if(!is.null(edges_file)) cat("  - Edges:", basename(edges_file), "\n")
+  cat("\nCSV files:\n")
+  cat("  - Nodes:", basename(nodes_csv), "\n")
+  if(!is.null(edges_csv)) cat("  - Edges:", basename(edges_csv), "\n")
+  cat("\nData summary:\n")
+  cat("  - Total universities:", nrow(nodes_data), "\n")
+  cat("  - Total collaborations:", nrow(gen26_data$edge_weights), "\n")
+  cat("  - Core universities:", sum(nodes_data$cp_role == "CORE"), "\n")
+  cat("  - Periphery universities:", sum(nodes_data$cp_role == "PERIPHERY"), "\n\n")
+
+  return(list(
+    nodes_shp = nodes_file,
+    edges_shp = edges_file,
+    nodes_csv = nodes_csv,
+    edges_csv = edges_csv,
+    output_dir = normalizePath(output_dir)
+  ))
+}
+
+# Execute the export
+qgis_files <- export_qgis_network_files(gen26_data, cp_results)
 ```

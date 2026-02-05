@@ -46,16 +46,31 @@ Demonstration of end-to-end course pipeline.
 
 
 ### 2. Data Preparation
-Clean Data - Rows with Null values delete them
+- **Data Cleaning**:
+    - filtering out NA/empty values
+    - deduplication using distinct() operations
+- **Data Extraction**:
+    - works_from_chunk(): publication metadata
+    - authors_from_chunk(): author information
+    - affils_from_chunk(): affiliations information
+- **Collaboration Filtering**:
+    - check_collaboration(): identifying papers with ≥2 affiliations
 
 
 ### 3. Geocode
+- **Address Construction**: paste(affil, city, country, sep = ", ")
+- **Geocoding Service**: method = "osm"
+- **Coordinate Output**: lat = latitude, long = longitude
 
-
-### 4. Create Network
-
-
-### 5. Weight Edges and Nodes
+### 4. Network Analysis Method
+- **Network Construction**:
+    - igraph network
+    - Nodes: Affilimations
+    - Weighted Edges: Collaborative publications between university pairs
+- **Borgatti-Everett Core-Periphery Analysis**:
+    - Rank-1 approximation with degree centrality
+    - Rank-1 approximation with eigenvector centrality
+    - Genetic Algorithm
 
 
 
@@ -83,6 +98,17 @@ Clean Data - Rows with Null values delete them
 
 # Results
 
+### GEN26 University Collaboration Network
+![](figures/collaboration_network.png)
+
+### QGIS
+![](figures/QGIS_CollabUnis.png)
+
+### Borgatti-Everett Core-Periphery Analysis
+![](figures/Borgatti_Everett_Core_Periphery_Model.png)
+
+### Bar Chart
+![](figures/barChart.png)
 
 
 

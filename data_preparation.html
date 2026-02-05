@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Data Preparation: Collaborative Papers from Italian Universities</title>
+<title>Data Preparation: Collaborative Papers from GEN26 Universities</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -81,25 +81,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
+  <li><a href="#pipeline" id="toc-pipeline" class="nav-link" data-scroll-target="#pipeline"><span class="header-section-number">2</span> Pipeline</a>
   <ul class="collapse">
-  <li><a href="#the-filtered-data-is-then-stored-in-a-sqlite-database-using-the-same-structure-as-the-original-ingestion-pipeline." id="toc-the-filtered-data-is-then-stored-in-a-sqlite-database-using-the-same-structure-as-the-original-ingestion-pipeline." class="nav-link" data-scroll-target="#the-filtered-data-is-then-stored-in-a-sqlite-database-using-the-same-structure-as-the-original-ingestion-pipeline."><span class="header-section-number">1.1</span> The filtered data is then stored in a SQLite database using the same structure as the original ingestion pipeline.</a>
-  <ul class="collapse">
-  <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages"><span class="header-section-number">1.1.1</span> Packages</a></li>
-  <li><a href="#paths" id="toc-paths" class="nav-link" data-scroll-target="#paths"><span class="header-section-number">1.1.2</span> Paths</a></li>
-  <li><a href="#target-universities" id="toc-target-universities" class="nav-link" data-scroll-target="#target-universities"><span class="header-section-number">1.1.3</span> Target Universities</a></li>
-  <li><a href="#small-helpers" id="toc-small-helpers" class="nav-link" data-scroll-target="#small-helpers"><span class="header-section-number">1.1.4</span> Small helpers</a></li>
-  <li><a href="#collaboration-filter-function" id="toc-collaboration-filter-function" class="nav-link" data-scroll-target="#collaboration-filter-function"><span class="header-section-number">1.1.5</span> Collaboration Filter Function</a></li>
-  <li><a href="#tidy-functions-for-one-streamed-chunk" id="toc-tidy-functions-for-one-streamed-chunk" class="nav-link" data-scroll-target="#tidy-functions-for-one-streamed-chunk"><span class="header-section-number">1.1.6</span> Tidy functions for one streamed chunk</a></li>
-  <li><a href="#database-creation-sqlite" id="toc-database-creation-sqlite" class="nav-link" data-scroll-target="#database-creation-sqlite"><span class="header-section-number">1.1.7</span> Database creation (SQLite)</a></li>
-  <li><a href="#streamed-ingestion-with-collaboration-filtering" id="toc-streamed-ingestion-with-collaboration-filtering" class="nav-link" data-scroll-target="#streamed-ingestion-with-collaboration-filtering"><span class="header-section-number">1.1.8</span> Streamed ingestion with collaboration filtering</a></li>
-  <li><a href="#run-ingestion" id="toc-run-ingestion" class="nav-link" data-scroll-target="#run-ingestion"><span class="header-section-number">1.1.9</span> Run ingestion</a></li>
-  <li><a href="#sanity-checks" id="toc-sanity-checks" class="nav-link" data-scroll-target="#sanity-checks"><span class="header-section-number">1.1.10</span> Sanity checks</a></li>
-  <li><a href="#get-works-authors-and-affilitations" id="toc-get-works-authors-and-affilitations" class="nav-link" data-scroll-target="#get-works-authors-and-affilitations"><span class="header-section-number">1.1.11</span> Get Works, Authors and Affilitations</a></li>
-  <li><a href="#get-collaboration" id="toc-get-collaboration" class="nav-link" data-scroll-target="#get-collaboration"><span class="header-section-number">1.1.12</span> Get Collaboration</a></li>
-  <li><a href="#geocode" id="toc-geocode" class="nav-link" data-scroll-target="#geocode"><span class="header-section-number">1.1.13</span> Geocode</a></li>
-  <li><a href="#save-data" id="toc-save-data" class="nav-link" data-scroll-target="#save-data"><span class="header-section-number">1.1.14</span> Save Data</a></li>
-  </ul></li>
+  <li><a href="#packages" id="toc-packages" class="nav-link" data-scroll-target="#packages"><span class="header-section-number">2.0.1</span> Packages</a></li>
+  <li><a href="#paths" id="toc-paths" class="nav-link" data-scroll-target="#paths"><span class="header-section-number">2.0.2</span> Paths</a></li>
+  <li><a href="#target-universities" id="toc-target-universities" class="nav-link" data-scroll-target="#target-universities"><span class="header-section-number">2.0.3</span> Target Universities</a></li>
+  <li><a href="#small-helpers" id="toc-small-helpers" class="nav-link" data-scroll-target="#small-helpers"><span class="header-section-number">2.0.4</span> Small helpers</a></li>
+  <li><a href="#tidy-functions-for-one-streamed-chunk" id="toc-tidy-functions-for-one-streamed-chunk" class="nav-link" data-scroll-target="#tidy-functions-for-one-streamed-chunk"><span class="header-section-number">2.0.5</span> Tidy functions for one streamed chunk</a></li>
+  <li><a href="#database-creation-sqlite" id="toc-database-creation-sqlite" class="nav-link" data-scroll-target="#database-creation-sqlite"><span class="header-section-number">2.0.6</span> Database creation (SQLite)</a></li>
+  <li><a href="#streamed-ingestion-with-collaboration-filtering" id="toc-streamed-ingestion-with-collaboration-filtering" class="nav-link" data-scroll-target="#streamed-ingestion-with-collaboration-filtering"><span class="header-section-number">2.0.7</span> Streamed ingestion with collaboration filtering</a></li>
+  <li><a href="#run-ingestion" id="toc-run-ingestion" class="nav-link" data-scroll-target="#run-ingestion"><span class="header-section-number">2.0.8</span> Run ingestion</a></li>
+  <li><a href="#sanity-checks" id="toc-sanity-checks" class="nav-link" data-scroll-target="#sanity-checks"><span class="header-section-number">2.0.9</span> Sanity checks</a></li>
+  <li><a href="#get-works-authors-and-affilitations" id="toc-get-works-authors-and-affilitations" class="nav-link" data-scroll-target="#get-works-authors-and-affilitations"><span class="header-section-number">2.0.10</span> Get Works, Authors and Affilitations</a></li>
+  <li><a href="#collaboration-filtering" id="toc-collaboration-filtering" class="nav-link" data-scroll-target="#collaboration-filtering"><span class="header-section-number">2.1</span> Collaboration Filtering</a></li>
+  <li><a href="#geocoding" id="toc-geocoding" class="nav-link" data-scroll-target="#geocoding"><span class="header-section-number">2.2</span> Geocoding</a></li>
+  <li><a href="#save-data" id="toc-save-data" class="nav-link" data-scroll-target="#save-data"><span class="header-section-number">2.3</span> Save Data</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -108,7 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Data Preparation: Collaborative Papers from Italian Universities</h1>
+<h1 class="title">Data Preparation: Collaborative Papers from GEN26 Universities</h1>
 </div>
 
 
@@ -135,10 +132,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Università IULM Milano</li>
 <li>Politecnico di Milano</li>
 </ul>
-<section id="the-filtered-data-is-then-stored-in-a-sqlite-database-using-the-same-structure-as-the-original-ingestion-pipeline." class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="the-filtered-data-is-then-stored-in-a-sqlite-database-using-the-same-structure-as-the-original-ingestion-pipeline."><span class="header-section-number">1.1</span> The filtered data is then stored in a SQLite database using the same structure as the original ingestion pipeline.</h2>
-<section id="packages" class="level3" data-number="1.1.1">
-<h3 data-number="1.1.1" class="anchored" data-anchor-id="packages"><span class="header-section-number">1.1.1</span> Packages</h3>
+<p>The filtered data is then stored in a SQLite database using the same structure as the original ingestion pipeline.</p>
+</section>
+<section id="pipeline" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Pipeline</h1>
+<ol type="1">
+<li>Data Cleaning</li>
+<li>Data Extraction</li>
+<li>Collaboration Filtering</li>
+<li>Geocoding</li>
+<li>Save Data</li>
+</ol>
+<section id="packages" class="level3" data-number="2.0.1">
+<h3 data-number="2.0.1" class="anchored" data-anchor-id="packages"><span class="header-section-number">2.0.1</span> Packages</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
@@ -149,13 +155,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DBI)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RSQLite)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidygeocoder)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidygeocoder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
-<section id="paths" class="level3" data-number="1.1.2">
-<h3 data-number="1.1.2" class="anchored" data-anchor-id="paths"><span class="header-section-number">1.1.2</span> Paths</h3>
+<section id="paths" class="level3" data-number="2.0.2">
+<h3 data-number="2.0.2" class="anchored" data-anchor-id="paths"><span class="header-section-number">2.0.2</span> Paths</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
@@ -169,8 +174,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 </section>
-<section id="target-universities" class="level3" data-number="1.1.3">
-<h3 data-number="1.1.3" class="anchored" data-anchor-id="target-universities"><span class="header-section-number">1.1.3</span> Target Universities</h3>
+<section id="target-universities" class="level3" data-number="2.0.3">
+<h3 data-number="2.0.3" class="anchored" data-anchor-id="target-universities"><span class="header-section-number">2.0.3</span> Target Universities</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
@@ -184,8 +189,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 </section>
-<section id="small-helpers" class="level3" data-number="1.1.4">
-<h3 data-number="1.1.4" class="anchored" data-anchor-id="small-helpers"><span class="header-section-number">1.1.4</span> Small helpers</h3>
+<section id="small-helpers" class="level3" data-number="2.0.4">
+<h3 data-number="2.0.4" class="anchored" data-anchor-id="small-helpers"><span class="header-section-number">2.0.4</span> Small helpers</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
@@ -200,325 +205,309 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </details>
 </div>
 </section>
-<section id="collaboration-filter-function" class="level3" data-number="1.1.5">
-<h3 data-number="1.1.5" class="anchored" data-anchor-id="collaboration-filter-function"><span class="header-section-number">1.1.5</span> Collaboration Filter Function</h3>
+<section id="tidy-functions-for-one-streamed-chunk" class="level3" data-number="2.0.5">
+<h3 data-number="2.0.5" class="anchored" data-anchor-id="tidy-functions-for-one-streamed-chunk"><span class="header-section-number">2.0.5</span> Tidy functions for one streamed chunk</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>check_collaboration <span class="ot">&lt;-</span> <span class="cf">function</span>(affils_df) {</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(affils_df) <span class="sc">==</span> <span class="dv">0</span>) <span class="fu">return</span>(<span class="cn">FALSE</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  affil_names <span class="ot">&lt;-</span> affils_df<span class="sc">$</span>affil</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  matches <span class="ot">&lt;-</span> <span class="fu">sum</span>(TARGET_UNIVERSITIES <span class="sc">%in%</span> affil_names)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(matches <span class="sc">&gt;=</span> <span class="dv">2</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Works (one row per record)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>works_from_chunk <span class="ot">&lt;-</span> <span class="cf">function</span>(chunk) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  chunk <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">eid          =</span> .data<span class="sc">$</span>eid,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">title        =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">dc:title</span><span class="st">`</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">doi          =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">prism:doi</span><span class="st">`</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">cover_date   =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">prism:coverDate</span><span class="st">`</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">cover_disp   =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">prism:coverDisplayDate</span><span class="st">`</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">journal      =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">prism:publicationName</span><span class="st">`</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtype      =</span> .data<span class="sc">$</span>subtype,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtype_desc =</span> .data<span class="sc">$</span>subtypeDescription,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">citedby      =</span> <span class="fu">suppressWarnings</span>(<span class="fu">as.integer</span>(.data<span class="sc">$</span><span class="st">`</span><span class="at">citedby-count</span><span class="st">`</span>)),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">year =</span> <span class="fu">suppressWarnings</span>(<span class="fu">as.integer</span>(</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_extract</span>(<span class="fu">paste</span>(cover_date <span class="sc">%||%</span> <span class="st">""</span>, cover_disp <span class="sc">%||%</span> <span class="st">""</span>), <span class="st">"([12][0-9]{3})"</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>      ))</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Authors (explode list -&gt; long table)</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>authors_from_chunk <span class="ot">&lt;-</span> <span class="cf">function</span>(chunk) {</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="st">"author"</span> <span class="sc">%in%</span> <span class="fu">names</span>(chunk)) <span class="fu">return</span>(<span class="fu">tibble</span>())</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  chunk <span class="sc">%&gt;%</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(eid, author) <span class="sc">%&gt;%</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">author =</span> <span class="fu">map</span>(author, .as_list_of_rows)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_longer</span>(author, <span class="at">keep_empty =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_wider</span>(author) <span class="sc">%&gt;%</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">author_position =</span> <span class="fu">suppressWarnings</span>(<span class="fu">as.integer</span>(</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">coalesce</span>(</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (<span class="st">"seq"</span>  <span class="sc">%in%</span> <span class="fu">names</span>(.)) .data<span class="sc">$</span>seq  <span class="cf">else</span> <span class="cn">NULL</span>,</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (<span class="st">"@seq"</span> <span class="sc">%in%</span> <span class="fu">names</span>(.)) .data<span class="sc">$</span><span class="st">`</span><span class="at">@seq</span><span class="st">`</span> <span class="cf">else</span> <span class="cn">NULL</span>,</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (<span class="st">"order"</span><span class="sc">%in%</span> <span class="fu">names</span>(.)) .data<span class="sc">$</span>order <span class="cf">else</span> <span class="cn">NULL</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>      ))</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>      eid,</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>      <span class="at">auth_id   =</span> <span class="fu">coalesce</span>(<span class="sc">!!!</span>rlang<span class="sc">::</span><span class="fu">syms</span>(<span class="fu">intersect</span>(<span class="fu">names</span>(.), <span class="fu">c</span>(<span class="st">"authid"</span>,<span class="st">"auth-id"</span>,<span class="st">"author-id"</span>)))),</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>      <span class="at">auth_name =</span> <span class="fu">coalesce</span>(<span class="sc">!!!</span>rlang<span class="sc">::</span><span class="fu">syms</span>(<span class="fu">intersect</span>(<span class="fu">names</span>(.), <span class="fu">c</span>(<span class="st">"authname"</span>,<span class="st">"author"</span>,<span class="st">"name"</span>)))),</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>      author_position,</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>      <span class="at">orcid     =</span> <span class="fu">coalesce</span>(<span class="sc">!!!</span>rlang<span class="sc">::</span><span class="fu">syms</span>(<span class="fu">intersect</span>(<span class="fu">names</span>(.), <span class="fu">c</span>(<span class="st">"orcid"</span>,<span class="st">"orcid-id"</span>))))</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Affiliations (explode list -&gt; long table)</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>affils_from_chunk <span class="ot">&lt;-</span> <span class="cf">function</span>(chunk) {</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="st">"affiliation"</span> <span class="sc">%in%</span> <span class="fu">names</span>(chunk)) <span class="fu">return</span>(<span class="fu">tibble</span>())</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  to_rowlist <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(x)) <span class="fu">list</span>()</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> (<span class="fu">is.data.frame</span>(x)) <span class="fu">unname</span>(<span class="fu">split</span>(x, <span class="fu">seq_len</span>(<span class="fu">nrow</span>(x))))</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> (<span class="fu">is.list</span>(x)) x</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="fu">list</span>()</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>  make_coal <span class="ot">&lt;-</span> <span class="cf">function</span>(df, candidates) {</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    cand <span class="ot">&lt;-</span> <span class="fu">intersect</span>(candidates, <span class="fu">names</span>(df))</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">length</span>(cand)) <span class="fu">rep</span>(<span class="cn">NA_character_</span>, <span class="fu">nrow</span>(df)) <span class="cf">else</span> dplyr<span class="sc">::</span><span class="fu">coalesce</span>(<span class="sc">!!!</span>df[cand])</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> chunk <span class="sc">%&gt;%</span></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(eid, affiliation) <span class="sc">%&gt;%</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">affiliation =</span> <span class="fu">map</span>(affiliation, to_rowlist)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_longer</span>(affiliation, <span class="at">keep_empty =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_wider</span>(affiliation)</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">nrow</span>(df)) {</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">tibble</span>(<span class="at">eid=</span><span class="fu">character</span>(), <span class="at">afid=</span><span class="fu">character</span>(), <span class="at">affil=</span><span class="fu">character</span>(), <span class="at">city=</span><span class="fu">character</span>(), <span class="at">country=</span><span class="fu">character</span>()))</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>afid    <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="st">"afid"</span> <span class="sc">%in%</span> <span class="fu">names</span>(df)) <span class="fu">as.character</span>(df<span class="sc">$</span>afid) <span class="cf">else</span> <span class="fu">rep</span>(<span class="cn">NA_character_</span>, <span class="fu">nrow</span>(df))</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>affil   <span class="ot">&lt;-</span> <span class="fu">make_coal</span>(df, <span class="fu">c</span>(<span class="st">"affilname"</span>,<span class="st">"affiliation-name"</span>,<span class="st">"affiliationName"</span>,<span class="st">"affiliation"</span>))</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>city    <span class="ot">&lt;-</span> <span class="fu">make_coal</span>(df, <span class="fu">c</span>(<span class="st">"affiliation-city"</span>,<span class="st">"city"</span>))</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>country <span class="ot">&lt;-</span> <span class="fu">make_coal</span>(df, <span class="fu">c</span>(<span class="st">"affiliation-country"</span>,<span class="st">"country"</span>))</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span> <span class="fu">transmute</span>(eid, afid, affil, city, country) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>()</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
-<section id="tidy-functions-for-one-streamed-chunk" class="level3" data-number="1.1.6">
-<h3 data-number="1.1.6" class="anchored" data-anchor-id="tidy-functions-for-one-streamed-chunk"><span class="header-section-number">1.1.6</span> Tidy functions for one streamed chunk</h3>
+<section id="database-creation-sqlite" class="level3" data-number="2.0.6">
+<h3 data-number="2.0.6" class="anchored" data-anchor-id="database-creation-sqlite"><span class="header-section-number">2.0.6</span> Database creation (SQLite)</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Works (one row per record)</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>works_from_chunk <span class="ot">&lt;-</span> <span class="cf">function</span>(chunk) {</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  chunk <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">eid          =</span> .data<span class="sc">$</span>eid,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">title        =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">dc:title</span><span class="st">`</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">doi          =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">prism:doi</span><span class="st">`</span>,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">cover_date   =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">prism:coverDate</span><span class="st">`</span>,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">cover_disp   =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">prism:coverDisplayDate</span><span class="st">`</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">journal      =</span> .data<span class="sc">$</span><span class="st">`</span><span class="at">prism:publicationName</span><span class="st">`</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtype      =</span> .data<span class="sc">$</span>subtype,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtype_desc =</span> .data<span class="sc">$</span>subtypeDescription,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">citedby      =</span> <span class="fu">suppressWarnings</span>(<span class="fu">as.integer</span>(.data<span class="sc">$</span><span class="st">`</span><span class="at">citedby-count</span><span class="st">`</span>)),</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">year =</span> <span class="fu">suppressWarnings</span>(<span class="fu">as.integer</span>(</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">str_extract</span>(<span class="fu">paste</span>(cover_date <span class="sc">%||%</span> <span class="st">""</span>, cover_disp <span class="sc">%||%</span> <span class="st">""</span>), <span class="st">"([12][0-9]{3})"</span>)</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>      ))</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Authors (explode list -&gt; long table)</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>authors_from_chunk <span class="ot">&lt;-</span> <span class="cf">function</span>(chunk) {</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="st">"author"</span> <span class="sc">%in%</span> <span class="fu">names</span>(chunk)) <span class="fu">return</span>(<span class="fu">tibble</span>())</span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  chunk <span class="sc">%&gt;%</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(eid, author) <span class="sc">%&gt;%</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">author =</span> <span class="fu">map</span>(author, .as_list_of_rows)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_longer</span>(author, <span class="at">keep_empty =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_wider</span>(author) <span class="sc">%&gt;%</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">author_position =</span> <span class="fu">suppressWarnings</span>(<span class="fu">as.integer</span>(</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">coalesce</span>(</span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (<span class="st">"seq"</span>  <span class="sc">%in%</span> <span class="fu">names</span>(.)) .data<span class="sc">$</span>seq  <span class="cf">else</span> <span class="cn">NULL</span>,</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (<span class="st">"@seq"</span> <span class="sc">%in%</span> <span class="fu">names</span>(.)) .data<span class="sc">$</span><span class="st">`</span><span class="at">@seq</span><span class="st">`</span> <span class="cf">else</span> <span class="cn">NULL</span>,</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (<span class="st">"order"</span><span class="sc">%in%</span> <span class="fu">names</span>(.)) .data<span class="sc">$</span>order <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>      ))</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(</span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>      eid,</span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>      <span class="at">auth_id   =</span> <span class="fu">coalesce</span>(<span class="sc">!!!</span>rlang<span class="sc">::</span><span class="fu">syms</span>(<span class="fu">intersect</span>(<span class="fu">names</span>(.), <span class="fu">c</span>(<span class="st">"authid"</span>,<span class="st">"auth-id"</span>,<span class="st">"author-id"</span>)))),</span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>      <span class="at">auth_name =</span> <span class="fu">coalesce</span>(<span class="sc">!!!</span>rlang<span class="sc">::</span><span class="fu">syms</span>(<span class="fu">intersect</span>(<span class="fu">names</span>(.), <span class="fu">c</span>(<span class="st">"authname"</span>,<span class="st">"author"</span>,<span class="st">"name"</span>)))),</span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>      author_position,</span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>      <span class="at">orcid     =</span> <span class="fu">coalesce</span>(<span class="sc">!!!</span>rlang<span class="sc">::</span><span class="fu">syms</span>(<span class="fu">intersect</span>(<span class="fu">names</span>(.), <span class="fu">c</span>(<span class="st">"orcid"</span>,<span class="st">"orcid-id"</span>))))</span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Affiliations (explode list -&gt; long table)</span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>affils_from_chunk <span class="ot">&lt;-</span> <span class="cf">function</span>(chunk) {</span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="st">"affiliation"</span> <span class="sc">%in%</span> <span class="fu">names</span>(chunk)) <span class="fu">return</span>(<span class="fu">tibble</span>())</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>  to_rowlist <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(x)) <span class="fu">list</span>()</span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> (<span class="fu">is.data.frame</span>(x)) <span class="fu">unname</span>(<span class="fu">split</span>(x, <span class="fu">seq_len</span>(<span class="fu">nrow</span>(x))))</span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> (<span class="fu">is.list</span>(x)) x</span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="fu">list</span>()</span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>  make_coal <span class="ot">&lt;-</span> <span class="cf">function</span>(df, candidates) {</span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>    cand <span class="ot">&lt;-</span> <span class="fu">intersect</span>(candidates, <span class="fu">names</span>(df))</span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">length</span>(cand)) <span class="fu">rep</span>(<span class="cn">NA_character_</span>, <span class="fu">nrow</span>(df)) <span class="cf">else</span> dplyr<span class="sc">::</span><span class="fu">coalesce</span>(<span class="sc">!!!</span>df[cand])</span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> chunk <span class="sc">%&gt;%</span></span>
-<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(eid, affiliation) <span class="sc">%&gt;%</span></span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">affiliation =</span> <span class="fu">map</span>(affiliation, to_rowlist)) <span class="sc">%&gt;%</span></span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_longer</span>(affiliation, <span class="at">keep_empty =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unnest_wider</span>(affiliation)</span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">nrow</span>(df)) {</span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(<span class="fu">tibble</span>(<span class="at">eid=</span><span class="fu">character</span>(), <span class="at">afid=</span><span class="fu">character</span>(), <span class="at">affil=</span><span class="fu">character</span>(), <span class="at">city=</span><span class="fu">character</span>(), <span class="at">country=</span><span class="fu">character</span>()))</span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>afid    <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="st">"afid"</span> <span class="sc">%in%</span> <span class="fu">names</span>(df)) <span class="fu">as.character</span>(df<span class="sc">$</span>afid) <span class="cf">else</span> <span class="fu">rep</span>(<span class="cn">NA_character_</span>, <span class="fu">nrow</span>(df))</span>
-<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>affil   <span class="ot">&lt;-</span> <span class="fu">make_coal</span>(df, <span class="fu">c</span>(<span class="st">"affilname"</span>,<span class="st">"affiliation-name"</span>,<span class="st">"affiliationName"</span>,<span class="st">"affiliation"</span>))</span>
-<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>city    <span class="ot">&lt;-</span> <span class="fu">make_coal</span>(df, <span class="fu">c</span>(<span class="st">"affiliation-city"</span>,<span class="st">"city"</span>))</span>
-<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>country <span class="ot">&lt;-</span> <span class="fu">make_coal</span>(df, <span class="fu">c</span>(<span class="st">"affiliation-country"</span>,<span class="st">"country"</span>))</span>
-<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span> <span class="fu">transmute</span>(eid, afid, affil, city, country) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>()</span>
-<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-</section>
-<section id="database-creation-sqlite" class="level3" data-number="1.1.7">
-<h3 data-number="1.1.7" class="anchored" data-anchor-id="database-creation-sqlite"><span class="header-section-number">1.1.7</span> Database creation (SQLite)</h3>
-<div class="cell">
-<details open="" class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), DB_PATH)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Pragmas for durability vs speed balance</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"PRAGMA journal_mode=WAL;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), DB_PATH)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Pragmas for durability vs speed balance</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"PRAGMA journal_mode=WAL;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"PRAGMA synchronous=NORMAL;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"PRAGMA synchronous=NORMAL;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tables</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="st">  CREATE TABLE IF NOT EXISTS works (</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="st">    eid TEXT PRIMARY KEY,</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="st">    title TEXT, doi TEXT, cover_date TEXT, cover_disp TEXT,</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="st">    journal TEXT, subtype TEXT, subtype_desc TEXT,</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="st">    citedby INTEGER, year INTEGER</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="st">  );</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tables</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="st">  CREATE TABLE IF NOT EXISTS works (</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="st">    eid TEXT PRIMARY KEY,</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">    title TEXT, doi TEXT, cover_date TEXT, cover_disp TEXT,</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">    journal TEXT, subtype TEXT, subtype_desc TEXT,</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">    citedby INTEGER, year INTEGER</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="st">  );</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="st">  CREATE TABLE IF NOT EXISTS work_authors (</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="st">    eid TEXT, auth_id TEXT, auth_name TEXT, author_position INTEGER, orcid TEXT</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">  );</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="st">  CREATE TABLE IF NOT EXISTS work_authors (</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="st">    eid TEXT, auth_id TEXT, auth_name TEXT, author_position INTEGER, orcid TEXT</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="st">  );</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="st">  CREATE TABLE IF NOT EXISTS work_affiliations (</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="st">    eid TEXT, afid TEXT, affil TEXT, city TEXT, country TEXT</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="st">  );</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="st">  CREATE TABLE IF NOT EXISTS work_affiliations (</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="st">    eid TEXT, afid TEXT, affil TEXT, city TEXT, country TEXT</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="st">  );</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Indexes</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE UNIQUE INDEX IF NOT EXISTS uix_works_doi ON works(doi) WHERE doi IS NOT NULL;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Indexes</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE UNIQUE INDEX IF NOT EXISTS uix_works_doi ON works(doi) WHERE doi IS NOT NULL;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_auth_eid    ON work_authors(eid);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_auth_eid    ON work_authors(eid);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_auth_authid ON work_authors(auth_id);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_auth_authid ON work_authors(auth_id);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_affil_eid   ON work_affiliations(eid);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_affil_eid   ON work_affiliations(eid);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_affil_afid  ON work_affiliations(afid);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_affil_afid  ON work_affiliations(afid);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_works_year  ON works(year);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbExecute</span>(con, <span class="st">"CREATE INDEX IF NOT EXISTS ix_works_year  ON works(year);"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
 </div>
 </section>
-<section id="streamed-ingestion-with-collaboration-filtering" class="level3" data-number="1.1.8">
-<h3 data-number="1.1.8" class="anchored" data-anchor-id="streamed-ingestion-with-collaboration-filtering"><span class="header-section-number">1.1.8</span> Streamed ingestion with collaboration filtering</h3>
+<section id="streamed-ingestion-with-collaboration-filtering" class="level3" data-number="2.0.7">
+<h3 data-number="2.0.7" class="anchored" data-anchor-id="streamed-ingestion-with-collaboration-filtering"><span class="header-section-number">2.0.7</span> Streamed ingestion with collaboration filtering</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>ingest_scopus_file <span class="ot">&lt;-</span> <span class="cf">function</span>(path, con, <span class="at">pagesize =</span> <span class="dv">20000</span>) {</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"→ Ingesting: "</span>, <span class="fu">basename</span>(path))</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  conx <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">endsWith</span>(path, <span class="st">".gz"</span>)) <span class="fu">gzfile</span>(path, <span class="st">"rt"</span>) <span class="cf">else</span> <span class="fu">file</span>(path, <span class="st">"rt"</span>)</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">on.exit</span>(<span class="fu">try</span>(<span class="fu">close</span>(conx), <span class="at">silent =</span> <span class="cn">TRUE</span>), <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">repeat</span> {</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    ch <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(jsonlite<span class="sc">::</span><span class="fu">stream_in</span>(conx, <span class="at">pagesize =</span> pagesize, <span class="at">verbose =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                   <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span>)</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(ch) <span class="sc">||</span> <span class="fu">nrow</span>(ch) <span class="sc">==</span> <span class="dv">0</span>) <span class="cf">break</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract tidy frames</span></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    w <span class="ot">&lt;-</span> <span class="fu">works_from_chunk</span>(ch)</span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> <span class="fu">authors_from_chunk</span>(ch)</span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>    f <span class="ot">&lt;-</span> <span class="fu">affils_from_chunk</span>(ch)</span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Light hygiene</span></span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> a <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(eid) <span class="sc">&amp;</span> <span class="fu">nzchar</span>(eid)) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(eid, auth_id, author_position, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    f <span class="ot">&lt;-</span> f <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(eid) <span class="sc">&amp;</span> <span class="fu">nzchar</span>(eid)) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(eid, afid, affil, city, country, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbBegin</span>(con)</span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>    ok <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tryCatch</span>({</span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nrow</span>(w)) {</span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># EID-based upsert</span></span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>        w_eid <span class="ot">&lt;-</span> w <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(eid) <span class="sc">&amp;</span> <span class="fu">nzchar</span>(eid))</span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">nrow</span>(w_eid)) {</span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbWriteTable</span>(con, <span class="st">"tmp_w"</span>, w_eid, <span class="at">temporary =</span> <span class="cn">TRUE</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
-<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a><span class="st">            INSERT OR REPLACE INTO works</span></span>
-<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a><span class="st">              (eid, title, doi, cover_date, cover_disp, journal, subtype, subtype_desc, citedby, year)</span></span>
-<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a><span class="st">            SELECT</span></span>
-<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a><span class="st">              n.eid,</span></span>
-<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.title,        w.title),</span></span>
-<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.doi,          w.doi),</span></span>
-<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.cover_date,   w.cover_date),</span></span>
-<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.cover_disp,   w.cover_disp),</span></span>
-<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.journal,      w.journal),</span></span>
-<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.subtype,      w.subtype),</span></span>
-<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.subtype_desc, w.subtype_desc),</span></span>
-<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.citedby,      w.citedby),</span></span>
-<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.year,         w.year)</span></span>
-<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a><span class="st">            FROM tmp_w AS n</span></span>
-<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a><span class="st">            LEFT JOIN works AS w ON w.eid = n.eid;</span></span>
-<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a><span class="st">          "</span>)</span>
-<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbExecute</span>(con, <span class="st">"DROP TABLE tmp_w;"</span>)</span>
-<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># DOI-only upsert (retain existing EID if DOI already present)</span></span>
-<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a>        w_doi <span class="ot">&lt;-</span> w <span class="sc">%&gt;%</span> <span class="fu">filter</span>((<span class="fu">is.na</span>(eid) <span class="sc">|</span> <span class="sc">!</span><span class="fu">nzchar</span>(eid)) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(doi) <span class="sc">&amp;</span> <span class="fu">nzchar</span>(doi))</span>
-<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">nrow</span>(w_doi)) {</span>
-<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbWriteTable</span>(con, <span class="st">"tmp_wd"</span>, w_doi, <span class="at">temporary =</span> <span class="cn">TRUE</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
-<span id="cb29-53"><a href="#cb29-53" aria-hidden="true" tabindex="-1"></a><span class="st">            INSERT OR REPLACE INTO works</span></span>
-<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a><span class="st">              (eid, title, doi, cover_date, cover_disp, journal, subtype, subtype_desc, citedby, year)</span></span>
-<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a><span class="st">            SELECT</span></span>
-<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(w.eid, NULL),</span></span>
-<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.title,        w.title),</span></span>
-<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.doi,          w.doi),</span></span>
-<span id="cb29-59"><a href="#cb29-59" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.cover_date,   w.cover_date),</span></span>
-<span id="cb29-60"><a href="#cb29-60" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.cover_disp,   w.cover_disp),</span></span>
-<span id="cb29-61"><a href="#cb29-61" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.journal,      w.journal),</span></span>
-<span id="cb29-62"><a href="#cb29-62" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.subtype,      w.subtype),</span></span>
-<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.subtype_desc, w.subtype_desc),</span></span>
-<span id="cb29-64"><a href="#cb29-64" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.citedby,      w.citedby),</span></span>
-<span id="cb29-65"><a href="#cb29-65" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.year,         w.year)</span></span>
-<span id="cb29-66"><a href="#cb29-66" aria-hidden="true" tabindex="-1"></a><span class="st">            FROM tmp_wd AS n</span></span>
-<span id="cb29-67"><a href="#cb29-67" aria-hidden="true" tabindex="-1"></a><span class="st">            LEFT JOIN works AS w ON w.doi = n.doi;</span></span>
-<span id="cb29-68"><a href="#cb29-68" aria-hidden="true" tabindex="-1"></a><span class="st">          "</span>)</span>
-<span id="cb29-69"><a href="#cb29-69" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbExecute</span>(con, <span class="st">"DROP TABLE tmp_wd;"</span>)</span>
-<span id="cb29-70"><a href="#cb29-70" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb29-71"><a href="#cb29-71" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb29-72"><a href="#cb29-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-73"><a href="#cb29-73" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nrow</span>(a)) <span class="fu">dbAppendTable</span>(con, <span class="st">"work_authors"</span>, a)</span>
-<span id="cb29-74"><a href="#cb29-74" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nrow</span>(f)) <span class="fu">dbAppendTable</span>(con, <span class="st">"work_affiliations"</span>, f)</span>
-<span id="cb29-75"><a href="#cb29-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-76"><a href="#cb29-76" aria-hidden="true" tabindex="-1"></a>      ok <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb29-77"><a href="#cb29-77" aria-hidden="true" tabindex="-1"></a>    }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
-<span id="cb29-78"><a href="#cb29-78" aria-hidden="true" tabindex="-1"></a>      <span class="fu">message</span>(<span class="st">"  ! Page failed: "</span>, <span class="fu">conditionMessage</span>(e))</span>
-<span id="cb29-79"><a href="#cb29-79" aria-hidden="true" tabindex="-1"></a>    }, <span class="at">finally =</span> {</span>
-<span id="cb29-80"><a href="#cb29-80" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (ok) <span class="fu">dbCommit</span>(con) <span class="cf">else</span> <span class="fu">dbRollback</span>(con)</span>
-<span id="cb29-81"><a href="#cb29-81" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb29-82"><a href="#cb29-82" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb29-83"><a href="#cb29-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">invisible</span>(<span class="cn">TRUE</span>)</span>
-<span id="cb29-84"><a href="#cb29-84" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb29-85"><a href="#cb29-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-86"><a href="#cb29-86" aria-hidden="true" tabindex="-1"></a>ingest_scopus_folder <span class="ot">&lt;-</span> <span class="cf">function</span>(folder, con, <span class="at">pattern=</span><span class="st">"</span><span class="sc">\\</span><span class="st">.jsonl(</span><span class="sc">\\</span><span class="st">.gz)?$"</span>, <span class="at">pagesize=</span><span class="dv">20000</span>) {</span>
-<span id="cb29-87"><a href="#cb29-87" aria-hidden="true" tabindex="-1"></a>  files <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">dir</span>(folder, <span class="at">pattern =</span> pattern, <span class="at">full.names =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb29-88"><a href="#cb29-88" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(files)) {</span>
-<span id="cb29-89"><a href="#cb29-89" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="fu">sprintf</span>(<span class="st">"[%d/%d] %s"</span>, i, <span class="fu">length</span>(files), <span class="fu">basename</span>(files[i])))</span>
-<span id="cb29-90"><a href="#cb29-90" aria-hidden="true" tabindex="-1"></a>    <span class="fu">try</span>(<span class="fu">ingest_scopus_file</span>(files[i], con, <span class="at">pagesize =</span> pagesize), <span class="at">silent =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb29-91"><a href="#cb29-91" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb29-92"><a href="#cb29-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">invisible</span>(<span class="cn">TRUE</span>)</span>
-<span id="cb29-93"><a href="#cb29-93" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>ingest_scopus_file <span class="ot">&lt;-</span> <span class="cf">function</span>(path, con, <span class="at">pagesize =</span> <span class="dv">20000</span>) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"→ Ingesting: "</span>, <span class="fu">basename</span>(path))</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  conx <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">endsWith</span>(path, <span class="st">".gz"</span>)) <span class="fu">gzfile</span>(path, <span class="st">"rt"</span>) <span class="cf">else</span> <span class="fu">file</span>(path, <span class="st">"rt"</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">on.exit</span>(<span class="fu">try</span>(<span class="fu">close</span>(conx), <span class="at">silent =</span> <span class="cn">TRUE</span>), <span class="at">add =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">repeat</span> {</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    ch <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(jsonlite<span class="sc">::</span><span class="fu">stream_in</span>(conx, <span class="at">pagesize =</span> pagesize, <span class="at">verbose =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>                   <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">is.null</span>(ch) <span class="sc">||</span> <span class="fu">nrow</span>(ch) <span class="sc">==</span> <span class="dv">0</span>) <span class="cf">break</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract tidy frames</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    w <span class="ot">&lt;-</span> <span class="fu">works_from_chunk</span>(ch)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> <span class="fu">authors_from_chunk</span>(ch)</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    f <span class="ot">&lt;-</span> <span class="fu">affils_from_chunk</span>(ch)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Light hygiene</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> a <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(eid) <span class="sc">&amp;</span> <span class="fu">nzchar</span>(eid)) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(eid, auth_id, author_position, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    f <span class="ot">&lt;-</span> f <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(eid) <span class="sc">&amp;</span> <span class="fu">nzchar</span>(eid)) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(eid, afid, affil, city, country, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dbBegin</span>(con)</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>    ok <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tryCatch</span>({</span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nrow</span>(w)) {</span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># EID-based upsert</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>        w_eid <span class="ot">&lt;-</span> w <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(eid) <span class="sc">&amp;</span> <span class="fu">nzchar</span>(eid))</span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">nrow</span>(w_eid)) {</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbWriteTable</span>(con, <span class="st">"tmp_w"</span>, w_eid, <span class="at">temporary =</span> <span class="cn">TRUE</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a><span class="st">            INSERT OR REPLACE INTO works</span></span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a><span class="st">              (eid, title, doi, cover_date, cover_disp, journal, subtype, subtype_desc, citedby, year)</span></span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a><span class="st">            SELECT</span></span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a><span class="st">              n.eid,</span></span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.title,        w.title),</span></span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.doi,          w.doi),</span></span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.cover_date,   w.cover_date),</span></span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.cover_disp,   w.cover_disp),</span></span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.journal,      w.journal),</span></span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.subtype,      w.subtype),</span></span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.subtype_desc, w.subtype_desc),</span></span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.citedby,      w.citedby),</span></span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.year,         w.year)</span></span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a><span class="st">            FROM tmp_w AS n</span></span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a><span class="st">            LEFT JOIN works AS w ON w.eid = n.eid;</span></span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a><span class="st">          "</span>)</span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbExecute</span>(con, <span class="st">"DROP TABLE tmp_w;"</span>)</span>
+<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># DOI-only upsert (retain existing EID if DOI already present)</span></span>
+<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a>        w_doi <span class="ot">&lt;-</span> w <span class="sc">%&gt;%</span> <span class="fu">filter</span>((<span class="fu">is.na</span>(eid) <span class="sc">|</span> <span class="sc">!</span><span class="fu">nzchar</span>(eid)) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(doi) <span class="sc">&amp;</span> <span class="fu">nzchar</span>(doi))</span>
+<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">nrow</span>(w_doi)) {</span>
+<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbWriteTable</span>(con, <span class="st">"tmp_wd"</span>, w_doi, <span class="at">temporary =</span> <span class="cn">TRUE</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-52"><a href="#cb28-52" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbExecute</span>(con, <span class="st">"</span></span>
+<span id="cb28-53"><a href="#cb28-53" aria-hidden="true" tabindex="-1"></a><span class="st">            INSERT OR REPLACE INTO works</span></span>
+<span id="cb28-54"><a href="#cb28-54" aria-hidden="true" tabindex="-1"></a><span class="st">              (eid, title, doi, cover_date, cover_disp, journal, subtype, subtype_desc, citedby, year)</span></span>
+<span id="cb28-55"><a href="#cb28-55" aria-hidden="true" tabindex="-1"></a><span class="st">            SELECT</span></span>
+<span id="cb28-56"><a href="#cb28-56" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(w.eid, NULL),</span></span>
+<span id="cb28-57"><a href="#cb28-57" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.title,        w.title),</span></span>
+<span id="cb28-58"><a href="#cb28-58" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.doi,          w.doi),</span></span>
+<span id="cb28-59"><a href="#cb28-59" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.cover_date,   w.cover_date),</span></span>
+<span id="cb28-60"><a href="#cb28-60" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.cover_disp,   w.cover_disp),</span></span>
+<span id="cb28-61"><a href="#cb28-61" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.journal,      w.journal),</span></span>
+<span id="cb28-62"><a href="#cb28-62" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.subtype,      w.subtype),</span></span>
+<span id="cb28-63"><a href="#cb28-63" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.subtype_desc, w.subtype_desc),</span></span>
+<span id="cb28-64"><a href="#cb28-64" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.citedby,      w.citedby),</span></span>
+<span id="cb28-65"><a href="#cb28-65" aria-hidden="true" tabindex="-1"></a><span class="st">              COALESCE(n.year,         w.year)</span></span>
+<span id="cb28-66"><a href="#cb28-66" aria-hidden="true" tabindex="-1"></a><span class="st">            FROM tmp_wd AS n</span></span>
+<span id="cb28-67"><a href="#cb28-67" aria-hidden="true" tabindex="-1"></a><span class="st">            LEFT JOIN works AS w ON w.doi = n.doi;</span></span>
+<span id="cb28-68"><a href="#cb28-68" aria-hidden="true" tabindex="-1"></a><span class="st">          "</span>)</span>
+<span id="cb28-69"><a href="#cb28-69" aria-hidden="true" tabindex="-1"></a>          <span class="fu">dbExecute</span>(con, <span class="st">"DROP TABLE tmp_wd;"</span>)</span>
+<span id="cb28-70"><a href="#cb28-70" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb28-71"><a href="#cb28-71" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb28-72"><a href="#cb28-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-73"><a href="#cb28-73" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nrow</span>(a)) <span class="fu">dbAppendTable</span>(con, <span class="st">"work_authors"</span>, a)</span>
+<span id="cb28-74"><a href="#cb28-74" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">nrow</span>(f)) <span class="fu">dbAppendTable</span>(con, <span class="st">"work_affiliations"</span>, f)</span>
+<span id="cb28-75"><a href="#cb28-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-76"><a href="#cb28-76" aria-hidden="true" tabindex="-1"></a>      ok <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb28-77"><a href="#cb28-77" aria-hidden="true" tabindex="-1"></a>    }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb28-78"><a href="#cb28-78" aria-hidden="true" tabindex="-1"></a>      <span class="fu">message</span>(<span class="st">"  ! Page failed: "</span>, <span class="fu">conditionMessage</span>(e))</span>
+<span id="cb28-79"><a href="#cb28-79" aria-hidden="true" tabindex="-1"></a>    }, <span class="at">finally =</span> {</span>
+<span id="cb28-80"><a href="#cb28-80" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (ok) <span class="fu">dbCommit</span>(con) <span class="cf">else</span> <span class="fu">dbRollback</span>(con)</span>
+<span id="cb28-81"><a href="#cb28-81" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb28-82"><a href="#cb28-82" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb28-83"><a href="#cb28-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">invisible</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb28-84"><a href="#cb28-84" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb28-85"><a href="#cb28-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-86"><a href="#cb28-86" aria-hidden="true" tabindex="-1"></a>ingest_scopus_folder <span class="ot">&lt;-</span> <span class="cf">function</span>(folder, con, <span class="at">pattern=</span><span class="st">"</span><span class="sc">\\</span><span class="st">.jsonl(</span><span class="sc">\\</span><span class="st">.gz)?$"</span>, <span class="at">pagesize=</span><span class="dv">20000</span>) {</span>
+<span id="cb28-87"><a href="#cb28-87" aria-hidden="true" tabindex="-1"></a>  files <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">dir</span>(folder, <span class="at">pattern =</span> pattern, <span class="at">full.names =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb28-88"><a href="#cb28-88" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(files)) {</span>
+<span id="cb28-89"><a href="#cb28-89" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="fu">sprintf</span>(<span class="st">"[%d/%d] %s"</span>, i, <span class="fu">length</span>(files), <span class="fu">basename</span>(files[i])))</span>
+<span id="cb28-90"><a href="#cb28-90" aria-hidden="true" tabindex="-1"></a>    <span class="fu">try</span>(<span class="fu">ingest_scopus_file</span>(files[i], con, <span class="at">pagesize =</span> pagesize), <span class="at">silent =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-91"><a href="#cb28-91" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb28-92"><a href="#cb28-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">invisible</span>(<span class="cn">TRUE</span>)</span>
+<span id="cb28-93"><a href="#cb28-93" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
-<section id="run-ingestion" class="level3" data-number="1.1.9">
-<h3 data-number="1.1.9" class="anchored" data-anchor-id="run-ingestion"><span class="header-section-number">1.1.9</span> Run ingestion</h3>
+<section id="run-ingestion" class="level3" data-number="2.0.8">
+<h3 data-number="2.0.8" class="anchored" data-anchor-id="run-ingestion"><span class="header-section-number">2.0.8</span> Run ingestion</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ingest_scopus_folder</span>(RAW_DIR, con, <span class="at">pagesize =</span> <span class="dv">20000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ingest_scopus_folder</span>(RAW_DIR, con, <span class="at">pagesize =</span> <span class="dv">20000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
-<section id="sanity-checks" class="level3" data-number="1.1.10">
-<h3 data-number="1.1.10" class="anchored" data-anchor-id="sanity-checks"><span class="header-section-number">1.1.10</span> Sanity checks</h3>
+<section id="sanity-checks" class="level3" data-number="2.0.9">
+<h3 data-number="2.0.9" class="anchored" data-anchor-id="sanity-checks"><span class="header-section-number">2.0.9</span> Sanity checks</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(con, <span class="st">"SELECT COUNT(*) AS n_works FROM works;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(con, <span class="st">"SELECT COUNT(*) AS n_works FROM works;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>  n_works
@@ -526,23 +515,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(con, <span class="st">"SELECT COUNT(*) AS n_authors FROM work_authors;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(con, <span class="st">"SELECT COUNT(*) AS n_authors FROM work_authors;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>  n_authors
-1    469210</code></pre>
+1    938420</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(con, <span class="st">"SELECT COUNT(*) AS n_affils  FROM work_affiliations;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(con, <span class="st">"SELECT COUNT(*) AS n_affils  FROM work_affiliations;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>  n_affils
-1   256912</code></pre>
+1   513824</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(con, <span class="st">"SELECT year, COUNT(*) AS n FROM works GROUP BY 1 ORDER BY 1;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dbGetQuery</span>(con, <span class="st">"SELECT year, COUNT(*) AS n FROM works GROUP BY 1 ORDER BY 1;"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>  year    n
@@ -553,17 +542,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="get-works-authors-and-affilitations" class="level3" data-number="1.1.11">
-<h3 data-number="1.1.11" class="anchored" data-anchor-id="get-works-authors-and-affilitations"><span class="header-section-number">1.1.11</span> Get Works, Authors and Affilitations</h3>
+<section id="get-works-authors-and-affilitations" class="level3" data-number="2.0.10">
+<h3 data-number="2.0.10" class="anchored" data-anchor-id="get-works-authors-and-affilitations"><span class="header-section-number">2.0.10</span> Get Works, Authors and Affilitations</h3>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="fu">list.files</span>(RAW_DIR, <span class="at">pattern=</span><span class="st">"</span><span class="sc">\\</span><span class="st">.jsonl(</span><span class="sc">\\</span><span class="st">.gz)?$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span>]</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>conx  <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">endsWith</span>(f, <span class="st">".gz"</span>)) <span class="fu">gzfile</span>(f, <span class="st">"rt"</span>) <span class="cf">else</span> <span class="fu">file</span>(f, <span class="st">"rt"</span>)</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>chunk <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">stream_in</span>(conx, <span class="at">pagesize =</span> <span class="dv">2000</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>); <span class="fu">close</span>(conx)</span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>w_preview  <span class="ot">&lt;-</span> <span class="fu">works_from_chunk</span>(chunk);  <span class="fu">head</span>(w_preview, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="fu">list.files</span>(RAW_DIR, <span class="at">pattern=</span><span class="st">"</span><span class="sc">\\</span><span class="st">.jsonl(</span><span class="sc">\\</span><span class="st">.gz)?$"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span>]</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>conx  <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">endsWith</span>(f, <span class="st">".gz"</span>)) <span class="fu">gzfile</span>(f, <span class="st">"rt"</span>) <span class="cf">else</span> <span class="fu">file</span>(f, <span class="st">"rt"</span>)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>chunk <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">stream_in</span>(conx, <span class="at">pagesize =</span> <span class="dv">2000</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>); <span class="fu">close</span>(conx)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>w_preview  <span class="ot">&lt;-</span> <span class="fu">works_from_chunk</span>(chunk);  <span class="fu">head</span>(w_preview, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>                  eid
@@ -589,7 +578,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>a_preview  <span class="ot">&lt;-</span> <span class="fu">authors_from_chunk</span>(chunk); <span class="fu">head</span>(a_preview, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>a_preview  <span class="ot">&lt;-</span> <span class="fu">authors_from_chunk</span>(chunk); <span class="fu">head</span>(a_preview, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 5
@@ -601,7 +590,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>f_preview  <span class="ot">&lt;-</span> <span class="fu">affils_from_chunk</span>(chunk); <span class="fu">head</span>(f_preview, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>f_preview  <span class="ot">&lt;-</span> <span class="fu">affils_from_chunk</span>(chunk); <span class="fu">head</span>(f_preview, <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 5
@@ -613,56 +602,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="get-collaboration" class="level3" data-number="1.1.12">
-<h3 data-number="1.1.12" class="anchored" data-anchor-id="get-collaboration"><span class="header-section-number">1.1.12</span> Get Collaboration</h3>
+<section id="collaboration-filtering" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="collaboration-filtering"><span class="header-section-number">2.1</span> Collaboration Filtering</h2>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>c_preview <span class="ot">&lt;-</span> f_preview <span class="sc">%&gt;%</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filter for target universities only</span></span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(affil <span class="sc">%in%</span> TARGET_UNIVERSITIES) <span class="sc">%&gt;%</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Group by eid and count distinct universities</span></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(eid) <span class="sc">%&gt;%</span></span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n_distinct</span>(affil) <span class="sc">&gt;=</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Optional: add collaboration metadata</span></span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(eid) <span class="sc">%&gt;%</span></span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_collab_unis =</span> <span class="fu">n_distinct</span>(affil),</span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">collab_unis =</span> <span class="fu">paste</span>(<span class="fu">sort</span>(<span class="fu">unique</span>(affil)), <span class="at">collapse =</span> <span class="st">" | "</span>)</span>
-<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>c_preview <span class="ot">&lt;-</span> f_preview <span class="sc">%&gt;%</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filter for target universities only</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(affil <span class="sc">%in%</span> TARGET_UNIVERSITIES) <span class="sc">%&gt;%</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Group by eid and count distinct universities</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(eid) <span class="sc">%&gt;%</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n_distinct</span>(affil) <span class="sc">&gt;=</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Optional: add collaboration metadata</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(eid) <span class="sc">%&gt;%</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_collab_unis =</span> <span class="fu">n_distinct</span>(affil),</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">collab_unis =</span> <span class="fu">paste</span>(<span class="fu">sort</span>(<span class="fu">unique</span>(affil)), <span class="at">collapse =</span> <span class="st">" | "</span>)</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
-<section id="geocode" class="level3" data-number="1.1.13">
-<h3 data-number="1.1.13" class="anchored" data-anchor-id="geocode"><span class="header-section-number">1.1.13</span> Geocode</h3>
+<section id="geocoding" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="geocoding"><span class="header-section-number">2.2</span> Geocoding</h2>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create address column combining city and country</span></span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>c_preview <span class="ot">&lt;-</span> c_preview <span class="sc">%&gt;%</span></span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">address =</span> <span class="fu">paste</span>(affil, city, country, <span class="at">sep =</span> <span class="st">", "</span>))</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Geocode to get latitude and longitude</span></span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>c_preview_geocoded <span class="ot">&lt;-</span> c_preview <span class="sc">%&gt;%</span></span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geocode</span>(address, <span class="at">method =</span> <span class="st">"osm"</span>, <span class="at">lat =</span> latitude, <span class="at">long =</span> longitude)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create address column combining city and country</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>c_preview <span class="ot">&lt;-</span> c_preview <span class="sc">%&gt;%</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">address =</span> <span class="fu">paste</span>(affil, city, country, <span class="at">sep =</span> <span class="st">", "</span>))</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Geocode to get latitude and longitude</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>c_preview_geocoded <span class="ot">&lt;-</span> c_preview <span class="sc">%&gt;%</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geocode</span>(address, <span class="at">method =</span> <span class="st">"osm"</span>, <span class="at">lat =</span> latitude, <span class="at">long =</span> longitude)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
-<section id="save-data" class="level3" data-number="1.1.14">
-<h3 data-number="1.1.14" class="anchored" data-anchor-id="save-data"><span class="header-section-number">1.1.14</span> Save Data</h3>
+<section id="save-data" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="save-data"><span class="header-section-number">2.3</span> Save Data</h2>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(w_preview, <span class="at">file=</span><span class="st">"w_preview.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(a_preview, <span class="at">file=</span><span class="st">"a_preview.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(f_preview, <span class="at">file=</span><span class="st">"f_preview.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(c_preview, <span class="at">file=</span><span class="st">"c_preview.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(c_preview_geocoded, <span class="at">file=</span><span class="st">"c_preview_geocoded.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(w_preview, <span class="at">file=</span><span class="st">"w_preview.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(a_preview, <span class="at">file=</span><span class="st">"a_preview.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(f_preview, <span class="at">file=</span><span class="st">"f_preview.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(c_preview, <span class="at">file=</span><span class="st">"c_preview.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(c_preview_geocoded, <span class="at">file=</span><span class="st">"c_preview_geocoded.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-</section>
 </section>
 </section>
 
