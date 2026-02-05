@@ -87,6 +87,23 @@ Clean Data - Rows with Null values delete them
 
 
 # Discussion
-Pro: They worked alot together as we can see
-Problem: We dont know how they worked together before the announcement of the program
-Other factors are involved in that collaboration
+
+### Interpretation
+• **Quality-over-Quantity Strategy**: The GEN26 network shows only 30% connectivity (3 out of 10 possible partnerships) but achieves exceptional productivity with 39.33 papers per active collaboration, indicating strategic focus on deep, sustained partnerships rather than broad networking
+
+• **Unrealized Collaboration Potential**: With 70% of possible partnerships unexplored and 40% of universities (2 out of 5) remaining isolated from inter-institutional collaboration, the network has significant expansion opportunities
+
+• **Geographic Independence**: Collaboration patterns are driven by research synergy rather than physical proximity - despite three universities being Milan-based, the network structure suggests strategic rather than location-based partnerships
+
+• **Methodologically Robust Classification**: The analysis employs three validation methods (degree centrality, eigenvector centrality, and genetic algorithm) with consensus voting to ensure reliable core-periphery identification, providing trustworthy structural insights
+
+
+### Limitations
+
+• **Temporal Scope Restriction**: Analysis limited to 2023-2026 publications only, creating a narrow 4-year window that may miss established collaboration patterns and suffer from publication lag effects, particularly for recent 2025-2026 collaborations that may not yet be indexed
+
+• **API Technical Constraints**: Data collection constrained by Scopus API rate limits (maximum 9 requests per second, 10,000 total requests per run), potentially resulting in incomplete data harvesting for highly productive institutions and missing publications due to technical limitations
+
+• **Narrow Institutional Scope**: Analysis restricted to only 5 pre-selected Italian universities with collaboration definition requiring at least 2 target institutions per paper,excluding single-institution research and partnerships with non-GEN26 universities, limiting generalizability
+
+• **Single Database Dependency**: Exclusive reliance on Scopus database may miss publications in non-indexed journals, conference proceedings, local Italian publications, or other academic databases, creating potential coverage gaps in collaboration assessment

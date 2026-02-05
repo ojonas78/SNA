@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Network Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="network_analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="network_analysis_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="network_analysis_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="network_analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="network_analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="network_analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="network_analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="network_analysis_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="network_analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="network_analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="network_analysis_files/libs/bootstrap/bootstrap-bb462d781dde1847d9e3ccf7736099dd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#basic-network-statistics" id="toc-basic-network-statistics" class="nav-link active" data-scroll-target="#basic-network-statistics"><span class="header-section-number">0.1</span> Basic Network Statistics</a></li>
+  <li><a href="#borgatti-everett-core-periphery-model" id="toc-borgatti-everett-core-periphery-model" class="nav-link" data-scroll-target="#borgatti-everett-core-periphery-model"><span class="header-section-number">0.2</span> <strong>Borgatti-Everett Core-Periphery Model</strong></a></li>
+  <li><a href="#network-figure-visualized" id="toc-network-figure-visualized" class="nav-link" data-scroll-target="#network-figure-visualized"><span class="header-section-number">0.3</span> Network figure visualized</a></li>
+  <li><a href="#bar-chart" id="toc-bar-chart" class="nav-link" data-scroll-target="#bar-chart"><span class="header-section-number">0.4</span> Bar Chart</a></li>
+  <li><a href="#export-for-gephi" id="toc-export-for-gephi" class="nav-link" data-scroll-target="#export-for-gephi"><span class="header-section-number">0.5</span> Export for Gephi</a></li>
+  <li><a href="#export-for-qgis" id="toc-export-for-qgis" class="nav-link" data-scroll-target="#export-for-qgis"><span class="header-section-number">0.6</span> Export for QGIS</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Network Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="basic-network-statistics" class="level3" data-number="0.1">
+<h3 data-number="0.1" class="anchored" data-anchor-id="basic-network-statistics"><span class="header-section-number">0.1</span> Basic Network Statistics</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>c_preview <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"c_preview.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>c_preview_geocoded <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"c_preview_geocoded.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Define all 5 GEN26 universities from your data</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>TARGET_UNIVERSITIES <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Università Bocconi"</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Università degli studi di Verona"</span>, </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Università Cattolica del Sacro Cuore"</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Università IULM Milano"</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Politecnico di Milano"</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Full Network Statistics (All 5 Universities)</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>calculate_full_network_stats <span class="ot">&lt;-</span> <span class="cf">function</span>(c_preview, all_universities) {</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1. NODES: All 5 universities (including isolated ones)</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  nodes <span class="ot">&lt;-</span> <span class="fu">length</span>(all_universities)</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2. Create collaboration pairs from c_preview</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  collab_pairs <span class="ot">&lt;-</span> c_preview <span class="sc">%&gt;%</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(eid, affil) <span class="sc">%&gt;%</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create all pairwise combinations within each publication</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(eid) <span class="sc">%&gt;%</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">do</span>({</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>      unis <span class="ot">&lt;-</span> .<span class="sc">$</span>affil</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">length</span>(unis) <span class="sc">&gt;=</span> <span class="dv">2</span>) {</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="fu">expand.grid</span>(<span class="at">uni1 =</span> unis, <span class="at">uni2 =</span> unis, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(uni1 <span class="sc">&lt;</span> uni2)  <span class="co"># Avoid duplicates and self-loops</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="fu">data.frame</span>(<span class="at">uni1 =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">uni2 =</span> <span class="fu">character</span>(<span class="dv">0</span>))</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    }) <span class="sc">%&gt;%</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Count collaborations between each university pair</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  edge_weights <span class="ot">&lt;-</span> collab_pairs <span class="sc">%&gt;%</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(uni1, uni2, <span class="at">name =</span> <span class="st">"weight"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(uni1, uni2)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 3. EDGES: Number of collaboration relationships</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  edges <span class="ot">&lt;-</span> <span class="fu">nrow</span>(edge_weights)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 4. Create igraph network including ALL universities</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Start with empty graph of all universities</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="fu">make_empty_graph</span>(<span class="at">n =</span> <span class="dv">0</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="fu">add_vertices</span>(g, nodes, <span class="at">name =</span> all_universities)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add edges if they exist</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(edges <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add edges to the graph</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    edge_list <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(edge_weights[, <span class="fu">c</span>(<span class="st">"uni1"</span>, <span class="st">"uni2"</span>)])</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">t</span>(edge_list))</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="fu">E</span>(g)<span class="sc">$</span>weight <span class="ot">&lt;-</span> edge_weights<span class="sc">$</span>weight</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate degrees for ALL vertices</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>  degrees <span class="ot">&lt;-</span> <span class="fu">degree</span>(g)</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  mean_degree <span class="ot">&lt;-</span> <span class="fu">mean</span>(degrees)</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>  median_degree <span class="ot">&lt;-</span> <span class="fu">median</span>(degrees)</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Identify isolated nodes</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  isolated_nodes <span class="ot">&lt;-</span> <span class="fu">sum</span>(degrees <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 5. WEIGHT SUMMARY</span></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  total_weight <span class="ot">&lt;-</span> <span class="fu">sum</span>(edge_weights<span class="sc">$</span>weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>  mean_weight <span class="ot">&lt;-</span> <span class="cf">if</span>(edges <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="fu">mean</span>(edge_weights<span class="sc">$</span>weight) <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 6. DENSITY CALCULATION</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>  max_possible_edges <span class="ot">&lt;-</span> nodes <span class="sc">*</span> (nodes <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  density <span class="ot">&lt;-</span> <span class="cf">if</span>(max_possible_edges <span class="sc">&gt;</span> <span class="dv">0</span>) edges <span class="sc">/</span> max_possible_edges <span class="cf">else</span> <span class="dv">0</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Return results</span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">nodes =</span> nodes,</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">edges =</span> edges,</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_degree =</span> <span class="fu">round</span>(mean_degree, <span class="dv">2</span>),</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_degree =</span> median_degree,</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_weight =</span> total_weight,</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_weight =</span> <span class="fu">round</span>(mean_weight, <span class="dv">2</span>),</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">density =</span> <span class="fu">round</span>(density, <span class="dv">3</span>),</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>    <span class="at">isolated_nodes =</span> isolated_nodes,</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_possible_edges =</span> max_possible_edges,</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>    <span class="at">degree_distribution =</span> degrees</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the full network statistics</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>full_stats <span class="ot">&lt;-</span> <span class="fu">calculate_full_network_stats</span>(c_preview, TARGET_UNIVERSITIES)</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="co"># Display results</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"=== FULL GEN26 NETWORK STATISTICS ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== FULL GEN26 NETWORK STATISTICS ===</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Nodes (Universities):"</span>, full_stats<span class="sc">$</span>nodes, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Nodes (Universities): 5 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Edges (Collaborations):"</span>, full_stats<span class="sc">$</span>edges, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Edges (Collaborations): 3 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean Degree:"</span>, full_stats<span class="sc">$</span>mean_degree, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean Degree: 1.2 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Median Degree:"</span>, full_stats<span class="sc">$</span>median_degree, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Median Degree: 2 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Total Weight (Publications):"</span>, full_stats<span class="sc">$</span>total_weight, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total Weight (Publications): 118 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean Weight per Edge:"</span>, full_stats<span class="sc">$</span>mean_weight, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean Weight per Edge: 39.33 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Network Density:"</span>, full_stats<span class="sc">$</span>density, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Network Density: 0.3 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Isolated Nodes:"</span>, full_stats<span class="sc">$</span>isolated_nodes, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Isolated Nodes: 2 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create summary table</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>network_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Metric =</span> <span class="fu">c</span>(<span class="st">"Nodes"</span>, <span class="st">"Edges"</span>, <span class="st">"Mean Degree"</span>, <span class="st">"Median Degree"</span>, </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Total Weight"</span>, <span class="st">"Mean Weight"</span>, <span class="st">"Density"</span>, <span class="st">"Isolated Nodes"</span>),</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Value =</span> <span class="fu">c</span>(full_stats<span class="sc">$</span>nodes, full_stats<span class="sc">$</span>edges, </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>            full_stats<span class="sc">$</span>mean_degree, full_stats<span class="sc">$</span>median_degree,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>            full_stats<span class="sc">$</span>total_weight, full_stats<span class="sc">$</span>mean_weight,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>            full_stats<span class="sc">$</span>density, full_stats<span class="sc">$</span>isolated_nodes),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Description =</span> <span class="fu">c</span>(<span class="st">"Total universities in consortium"</span>, </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Active collaboration relationships"</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Average partners per university"</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Median partners per university"</span>, </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Total collaborative publications"</span>,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Average publications per partnership"</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Proportion of possible connections"</span>,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Universities with no collaborations"</span>)</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(network_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>          Metric  Value                          Description
+1          Nodes   5.00     Total universities in consortium
+2          Edges   3.00   Active collaboration relationships
+3    Mean Degree   1.20      Average partners per university
+4  Median Degree   2.00       Median partners per university
+5   Total Weight 118.00     Total collaborative publications
+6    Mean Weight  39.33 Average publications per partnership
+7        Density   0.30   Proportion of possible connections
+8 Isolated Nodes   2.00  Universities with no collaborations</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show degree distribution</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== DEGREE DISTRIBUTION ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== DEGREE DISTRIBUTION ===</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>degree_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">University =</span> <span class="fu">names</span>(full_stats<span class="sc">$</span>degree_distribution),</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Degree =</span> <span class="fu">as.numeric</span>(full_stats<span class="sc">$</span>degree_distribution)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Degree))</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(degree_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                            University Degree
+1                   Università Bocconi      2
+2 Università Cattolica del Sacro Cuore      2
+3                Politecnico di Milano      2
+4     Università degli studi di Verona      0
+5               Università IULM Milano      0</code></pre>
+</div>
+</div>
+</section>
+<section id="borgatti-everett-core-periphery-model" class="level3" data-number="0.2">
+<h3 data-number="0.2" class="anchored" data-anchor-id="borgatti-everett-core-periphery-model"><span class="header-section-number">0.2</span> <strong>Borgatti-Everett Core-Periphery Model</strong></h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(netUtils)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(GA)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(maps)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geosphere)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Define all 5 GEN26 universities</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>TARGET_UNIVERSITIES <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Università Bocconi"</span>,</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Università degli studi di Verona"</span>, </span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Università Cattolica del Sacro Cuore"</span>,</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Università IULM Milano"</span>,</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Politecnico di Milano"</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to create igraph network from c_preview_geocoded data</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>create_gen26_network <span class="ot">&lt;-</span> <span class="cf">function</span>(c_preview_geocoded, all_universities) {</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create collaboration pairs</span></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>  collab_pairs <span class="ot">&lt;-</span> c_preview_geocoded <span class="sc">%&gt;%</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(eid, affil) <span class="sc">%&gt;%</span></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(eid) <span class="sc">%&gt;%</span></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">do</span>({</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>      unis <span class="ot">&lt;-</span> .<span class="sc">$</span>affil</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(<span class="fu">length</span>(unis) <span class="sc">&gt;=</span> <span class="dv">2</span>) {</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>        <span class="fu">expand.grid</span>(<span class="at">uni1 =</span> unis, <span class="at">uni2 =</span> unis, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(uni1 <span class="sc">&lt;</span> uni2)</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>        <span class="fu">data.frame</span>(<span class="at">uni1 =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">uni2 =</span> <span class="fu">character</span>(<span class="dv">0</span>))</span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>    }) <span class="sc">%&gt;%</span></span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>()</span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Count collaboration weights</span></span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>  edge_weights <span class="ot">&lt;-</span> collab_pairs <span class="sc">%&gt;%</span></span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(uni1, uni2, <span class="at">name =</span> <span class="st">"weight"</span>)</span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get university coordinates</span></span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a>  uni_coords <span class="ot">&lt;-</span> c_preview_geocoded <span class="sc">%&gt;%</span></span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(affil, latitude, longitude) <span class="sc">%&gt;%</span></span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>()</span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create igraph network with all universities</span></span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="fu">make_empty_graph</span>(<span class="at">n =</span> <span class="dv">0</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="fu">add_vertices</span>(g, <span class="fu">length</span>(all_universities), <span class="at">name =</span> all_universities)</span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add coordinates as vertex attributes</span></span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(all_universities)) {</span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a>    uni_name <span class="ot">&lt;-</span> all_universities[i]</span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a>    coords <span class="ot">&lt;-</span> uni_coords[uni_coords<span class="sc">$</span>affil <span class="sc">==</span> uni_name, ]</span>
+<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">nrow</span>(coords) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a>      <span class="fu">V</span>(g)[uni_name]<span class="sc">$</span>latitude <span class="ot">&lt;-</span> coords<span class="sc">$</span>latitude[<span class="dv">1</span>]</span>
+<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a>      <span class="fu">V</span>(g)[uni_name]<span class="sc">$</span>longitude <span class="ot">&lt;-</span> coords<span class="sc">$</span>longitude[<span class="dv">1</span>]</span>
+<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb25-58"><a href="#cb25-58" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Default coordinates if not found</span></span>
+<span id="cb25-59"><a href="#cb25-59" aria-hidden="true" tabindex="-1"></a>      <span class="fu">V</span>(g)[uni_name]<span class="sc">$</span>latitude <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb25-60"><a href="#cb25-60" aria-hidden="true" tabindex="-1"></a>      <span class="fu">V</span>(g)[uni_name]<span class="sc">$</span>longitude <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb25-61"><a href="#cb25-61" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb25-62"><a href="#cb25-62" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb25-63"><a href="#cb25-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-64"><a href="#cb25-64" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add edges if they exist</span></span>
+<span id="cb25-65"><a href="#cb25-65" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(edge_weights) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb25-66"><a href="#cb25-66" aria-hidden="true" tabindex="-1"></a>    edge_list <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(edge_weights[, <span class="fu">c</span>(<span class="st">"uni1"</span>, <span class="st">"uni2"</span>)])</span>
+<span id="cb25-67"><a href="#cb25-67" aria-hidden="true" tabindex="-1"></a>    g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">t</span>(edge_list))</span>
+<span id="cb25-68"><a href="#cb25-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">E</span>(g)<span class="sc">$</span>weight <span class="ot">&lt;-</span> edge_weights<span class="sc">$</span>weight</span>
+<span id="cb25-69"><a href="#cb25-69" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb25-70"><a href="#cb25-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-71"><a href="#cb25-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">graph =</span> g, <span class="at">edge_weights =</span> edge_weights, <span class="at">uni_coords =</span> uni_coords))</span>
+<span id="cb25-72"><a href="#cb25-72" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-73"><a href="#cb25-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-74"><a href="#cb25-74" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the network</span></span>
+<span id="cb25-75"><a href="#cb25-75" aria-hidden="true" tabindex="-1"></a>gen26_data <span class="ot">&lt;-</span> <span class="fu">create_gen26_network</span>(c_preview_geocoded, TARGET_UNIVERSITIES)</span>
+<span id="cb25-76"><a href="#cb25-76" aria-hidden="true" tabindex="-1"></a>gen26_network <span class="ot">&lt;-</span> gen26_data<span class="sc">$</span>graph</span>
+<span id="cb25-77"><a href="#cb25-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-78"><a href="#cb25-78" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply Borgatti-Everett Core-Periphery Model</span></span>
+<span id="cb25-79"><a href="#cb25-79" aria-hidden="true" tabindex="-1"></a>borgatti_everett_analysis <span class="ot">&lt;-</span> <span class="cf">function</span>(network) {</span>
+<span id="cb25-80"><a href="#cb25-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-81"><a href="#cb25-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"=== BORGATTI-EVERETT CORE-PERIPHERY ANALYSIS ===</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb25-82"><a href="#cb25-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-83"><a href="#cb25-83" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Method 1: Rank-1 approximation with degree centrality (fastest)</span></span>
+<span id="cb25-84"><a href="#cb25-84" aria-hidden="true" tabindex="-1"></a>  cp_rk1_dc <span class="ot">&lt;-</span> <span class="fu">core_periphery</span>(network, <span class="at">method =</span> <span class="st">"rk1_dc"</span>)</span>
+<span id="cb25-85"><a href="#cb25-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-86"><a href="#cb25-86" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Method 2: Rank-1 approximation with eigenvector centrality</span></span>
+<span id="cb25-87"><a href="#cb25-87" aria-hidden="true" tabindex="-1"></a>  cp_rk1_ec <span class="ot">&lt;-</span> <span class="fu">core_periphery</span>(network, <span class="at">method =</span> <span class="st">"rk1_ec"</span>)</span>
+<span id="cb25-88"><a href="#cb25-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-89"><a href="#cb25-89" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Method 3: Genetic Algorithm (most accurate but slower)</span></span>
+<span id="cb25-90"><a href="#cb25-90" aria-hidden="true" tabindex="-1"></a>  cp_ga <span class="ot">&lt;-</span> <span class="fu">core_periphery</span>(network, <span class="at">method =</span> <span class="st">"GA"</span>, <span class="at">iter =</span> <span class="dv">500</span>)</span>
+<span id="cb25-91"><a href="#cb25-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-92"><a href="#cb25-92" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create results summary</span></span>
+<span id="cb25-93"><a href="#cb25-93" aria-hidden="true" tabindex="-1"></a>  university_names <span class="ot">&lt;-</span> <span class="fu">V</span>(network)<span class="sc">$</span>name</span>
+<span id="cb25-94"><a href="#cb25-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-95"><a href="#cb25-95" aria-hidden="true" tabindex="-1"></a>  results_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb25-96"><a href="#cb25-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">University =</span> university_names,</span>
+<span id="cb25-97"><a href="#cb25-97" aria-hidden="true" tabindex="-1"></a>    <span class="at">RK1_DC_Assignment =</span> cp_rk1_dc<span class="sc">$</span>vec,</span>
+<span id="cb25-98"><a href="#cb25-98" aria-hidden="true" tabindex="-1"></a>    <span class="at">RK1_EC_Assignment =</span> cp_rk1_ec<span class="sc">$</span>vec,</span>
+<span id="cb25-99"><a href="#cb25-99" aria-hidden="true" tabindex="-1"></a>    <span class="at">GA_Assignment =</span> cp_ga<span class="sc">$</span>vec,</span>
+<span id="cb25-100"><a href="#cb25-100" aria-hidden="true" tabindex="-1"></a>    <span class="at">RK1_DC_Role =</span> <span class="fu">ifelse</span>(cp_rk1_dc<span class="sc">$</span>vec <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"CORE"</span>, <span class="st">"PERIPHERY"</span>),</span>
+<span id="cb25-101"><a href="#cb25-101" aria-hidden="true" tabindex="-1"></a>    <span class="at">RK1_EC_Role =</span> <span class="fu">ifelse</span>(cp_rk1_ec<span class="sc">$</span>vec <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"CORE"</span>, <span class="st">"PERIPHERY"</span>),</span>
+<span id="cb25-102"><a href="#cb25-102" aria-hidden="true" tabindex="-1"></a>    <span class="at">GA_Role =</span> <span class="fu">ifelse</span>(cp_ga<span class="sc">$</span>vec <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"CORE"</span>, <span class="st">"PERIPHERY"</span>)</span>
+<span id="cb25-103"><a href="#cb25-103" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-104"><a href="#cb25-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-105"><a href="#cb25-105" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Display results</span></span>
+<span id="cb25-106"><a href="#cb25-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"CORE-PERIPHERY ASSIGNMENTS:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-107"><a href="#cb25-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(results_table[, <span class="fu">c</span>(<span class="st">"University"</span>, <span class="st">"RK1_DC_Role"</span>, <span class="st">"RK1_EC_Role"</span>, <span class="st">"GA_Role"</span>)])</span>
+<span id="cb25-108"><a href="#cb25-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-109"><a href="#cb25-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">CORRELATION WITH IDEAL CORE-PERIPHERY STRUCTURE:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-110"><a href="#cb25-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Rank-1 Degree Centrality:"</span>, <span class="fu">round</span>(cp_rk1_dc<span class="sc">$</span>corr, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-111"><a href="#cb25-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Rank-1 Eigenvector Centrality:"</span>, <span class="fu">round</span>(cp_rk1_ec<span class="sc">$</span>corr, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-112"><a href="#cb25-112" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Genetic Algorithm:"</span>, <span class="fu">round</span>(cp_ga<span class="sc">$</span>corr, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-113"><a href="#cb25-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-114"><a href="#cb25-114" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Consensus analysis</span></span>
+<span id="cb25-115"><a href="#cb25-115" aria-hidden="true" tabindex="-1"></a>  consensus <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb25-116"><a href="#cb25-116" aria-hidden="true" tabindex="-1"></a>    <span class="at">University =</span> university_names,</span>
+<span id="cb25-117"><a href="#cb25-117" aria-hidden="true" tabindex="-1"></a>    <span class="at">Core_Votes =</span> cp_rk1_dc<span class="sc">$</span>vec <span class="sc">+</span> cp_rk1_ec<span class="sc">$</span>vec <span class="sc">+</span> cp_ga<span class="sc">$</span>vec,</span>
+<span id="cb25-118"><a href="#cb25-118" aria-hidden="true" tabindex="-1"></a>    <span class="at">Consensus_Role =</span> <span class="fu">ifelse</span>((cp_rk1_dc<span class="sc">$</span>vec <span class="sc">+</span> cp_rk1_ec<span class="sc">$</span>vec <span class="sc">+</span> cp_ga<span class="sc">$</span>vec) <span class="sc">&gt;=</span> <span class="dv">2</span>, <span class="st">"CORE"</span>, <span class="st">"PERIPHERY"</span>)</span>
+<span id="cb25-119"><a href="#cb25-119" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-120"><a href="#cb25-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-121"><a href="#cb25-121" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">CONSENSUS CORE-PERIPHERY STRUCTURE:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-122"><a href="#cb25-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(consensus[, <span class="fu">c</span>(<span class="st">"University"</span>, <span class="st">"Core_Votes"</span>, <span class="st">"Consensus_Role"</span>)])</span>
+<span id="cb25-123"><a href="#cb25-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-124"><a href="#cb25-124" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Network statistics by role</span></span>
+<span id="cb25-125"><a href="#cb25-125" aria-hidden="true" tabindex="-1"></a>  core_unis <span class="ot">&lt;-</span> consensus<span class="sc">$</span>University[consensus<span class="sc">$</span>Consensus_Role <span class="sc">==</span> <span class="st">"CORE"</span>]</span>
+<span id="cb25-126"><a href="#cb25-126" aria-hidden="true" tabindex="-1"></a>  periphery_unis <span class="ot">&lt;-</span> consensus<span class="sc">$</span>University[consensus<span class="sc">$</span>Consensus_Role <span class="sc">==</span> <span class="st">"PERIPHERY"</span>]</span>
+<span id="cb25-127"><a href="#cb25-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-128"><a href="#cb25-128" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">NETWORK STRUCTURE SUMMARY:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-129"><a href="#cb25-129" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Core Universities:"</span>, <span class="fu">length</span>(core_unis), <span class="st">"-"</span>, <span class="fu">paste</span>(core_unis, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-130"><a href="#cb25-130" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Periphery Universities:"</span>, <span class="fu">length</span>(periphery_unis), <span class="st">"-"</span>, <span class="fu">paste</span>(periphery_unis, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-131"><a href="#cb25-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-132"><a href="#cb25-132" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate core-periphery fit quality</span></span>
+<span id="cb25-133"><a href="#cb25-133" aria-hidden="true" tabindex="-1"></a>  best_method <span class="ot">&lt;-</span> <span class="fu">which.max</span>(<span class="fu">c</span>(cp_rk1_dc<span class="sc">$</span>corr, cp_rk1_ec<span class="sc">$</span>corr, cp_ga<span class="sc">$</span>corr))</span>
+<span id="cb25-134"><a href="#cb25-134" aria-hidden="true" tabindex="-1"></a>  method_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Rank-1 Degree Centrality"</span>, <span class="st">"Rank-1 Eigenvector Centrality"</span>, <span class="st">"Genetic Algorithm"</span>)</span>
+<span id="cb25-135"><a href="#cb25-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-136"><a href="#cb25-136" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">BEST FIT METHOD:"</span>, method_names[best_method], <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-137"><a href="#cb25-137" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"STRUCTURE FIT QUALITY:"</span>, <span class="fu">round</span>(<span class="fu">max</span>(cp_rk1_dc<span class="sc">$</span>corr, cp_rk1_ec<span class="sc">$</span>corr, cp_ga<span class="sc">$</span>corr), <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb25-138"><a href="#cb25-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-139"><a href="#cb25-139" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb25-140"><a href="#cb25-140" aria-hidden="true" tabindex="-1"></a>    <span class="at">rk1_dc =</span> cp_rk1_dc,</span>
+<span id="cb25-141"><a href="#cb25-141" aria-hidden="true" tabindex="-1"></a>    <span class="at">rk1_ec =</span> cp_rk1_ec,</span>
+<span id="cb25-142"><a href="#cb25-142" aria-hidden="true" tabindex="-1"></a>    <span class="at">ga =</span> cp_ga,</span>
+<span id="cb25-143"><a href="#cb25-143" aria-hidden="true" tabindex="-1"></a>    <span class="at">consensus =</span> consensus,</span>
+<span id="cb25-144"><a href="#cb25-144" aria-hidden="true" tabindex="-1"></a>    <span class="at">results_table =</span> results_table</span>
+<span id="cb25-145"><a href="#cb25-145" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb25-146"><a href="#cb25-146" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-147"><a href="#cb25-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-148"><a href="#cb25-148" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the analysis</span></span>
+<span id="cb25-149"><a href="#cb25-149" aria-hidden="true" tabindex="-1"></a>cp_results <span class="ot">&lt;-</span> <span class="fu">borgatti_everett_analysis</span>(gen26_network)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== BORGATTI-EVERETT CORE-PERIPHERY ANALYSIS ===
+
+CORE-PERIPHERY ASSIGNMENTS:
+                                                               University
+Università Bocconi                                     Università Bocconi
+Università degli studi di Verona         Università degli studi di Verona
+Università Cattolica del Sacro Cuore Università Cattolica del Sacro Cuore
+Università IULM Milano                             Università IULM Milano
+Politecnico di Milano                               Politecnico di Milano
+                                     RK1_DC_Role RK1_EC_Role   GA_Role
+Università Bocconi                          CORE        CORE PERIPHERY
+Università degli studi di Verona       PERIPHERY   PERIPHERY PERIPHERY
+Università Cattolica del Sacro Cuore        CORE   PERIPHERY      CORE
+Università IULM Milano                 PERIPHERY   PERIPHERY PERIPHERY
+Politecnico di Milano                       CORE        CORE      CORE
+
+CORRELATION WITH IDEAL CORE-PERIPHERY STRUCTURE:
+Rank-1 Degree Centrality: 1 
+Rank-1 Eigenvector Centrality: 1 
+Genetic Algorithm: 1 
+
+CONSENSUS CORE-PERIPHERY STRUCTURE:
+                                                               University
+Università Bocconi                                     Università Bocconi
+Università degli studi di Verona         Università degli studi di Verona
+Università Cattolica del Sacro Cuore Università Cattolica del Sacro Cuore
+Università IULM Milano                             Università IULM Milano
+Politecnico di Milano                               Politecnico di Milano
+                                     Core_Votes Consensus_Role
+Università Bocconi                            2           CORE
+Università degli studi di Verona              0      PERIPHERY
+Università Cattolica del Sacro Cuore          2           CORE
+Università IULM Milano                        0      PERIPHERY
+Politecnico di Milano                         3           CORE
+
+NETWORK STRUCTURE SUMMARY:
+Core Universities: 3 - Università Bocconi, Università Cattolica del Sacro Cuore, Politecnico di Milano 
+Periphery Universities: 2 - Università degli studi di Verona, Università IULM Milano 
+
+BEST FIT METHOD: Rank-1 Degree Centrality 
+STRUCTURE FIT QUALITY: 1 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># FIXED MAP 1: Edges and Weights Visualization</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>create_edges_map <span class="ot">&lt;-</span> <span class="cf">function</span>(gen26_data, cp_results) {</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check if we have edges to plot</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(gen26_data<span class="sc">$</span>edge_weights) <span class="sc">==</span> <span class="dv">0</span>) {</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"No edges to plot - creating nodes-only map</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(<span class="at">data =</span> gen26_data<span class="sc">$</span>uni_coords,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> longitude, <span class="at">y =</span> latitude),</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">4</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_text</span>(<span class="at">data =</span> gen26_data<span class="sc">$</span>uni_coords,</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>                <span class="fu">aes</span>(<span class="at">x =</span> longitude, <span class="at">y =</span> latitude, <span class="at">label =</span> affil),</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">axis.text =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"GEN26 Universities - No Collaborations Found"</span>,</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">subtitle =</span> <span class="st">"Red dots represent university locations"</span>)</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare edge data with coordinates</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>    edges_with_coords <span class="ot">&lt;-</span> gen26_data<span class="sc">$</span>edge_weights <span class="sc">%&gt;%</span></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">weight_factor =</span> <span class="fu">as.factor</span>(weight)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(gen26_data<span class="sc">$</span>uni_coords, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"uni1"</span> <span class="ot">=</span> <span class="st">"affil"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">lat1 =</span> latitude, <span class="at">lon1 =</span> longitude) <span class="sc">%&gt;%</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(gen26_data<span class="sc">$</span>uni_coords, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"uni2"</span> <span class="ot">=</span> <span class="st">"affil"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">lat2 =</span> latitude, <span class="at">lon2 =</span> longitude)</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create curved edges with proper error handling</span></span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>    edges_curved <span class="ot">&lt;-</span> edges_with_coords <span class="sc">%&gt;%</span></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">path_data =</span> <span class="fu">list</span>({</span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>          <span class="fu">tryCatch</span>({</span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>            path_result <span class="ot">&lt;-</span> <span class="fu">gcIntermediate</span>(<span class="fu">c</span>(lon1, lat1), <span class="fu">c</span>(lon2, lat2), </span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>                                        <span class="at">n =</span> <span class="dv">30</span>, <span class="at">addStartEnd =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Convert to data frame with proper column names</span></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span>(<span class="fu">is.matrix</span>(path_result)) {</span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>              <span class="fu">data.frame</span>(<span class="at">lon =</span> path_result[,<span class="dv">1</span>], <span class="at">lat =</span> path_result[,<span class="dv">2</span>])</span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>            } <span class="cf">else</span> {</span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>              <span class="fu">data.frame</span>(<span class="at">lon =</span> <span class="fu">c</span>(lon1, lon2), <span class="at">lat =</span> <span class="fu">c</span>(lat1, lat2))</span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>          }, <span class="at">error =</span> <span class="cf">function</span>(e) {</span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Fallback to straight line</span></span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>            <span class="fu">data.frame</span>(<span class="at">lon =</span> <span class="fu">c</span>(lon1, lon2), <span class="at">lat =</span> <span class="fu">c</span>(lat1, lat2))</span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>          })</span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">%&gt;%</span></span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>lat1, <span class="sc">-</span>lon1, <span class="sc">-</span>lat2, <span class="sc">-</span>lon2) <span class="sc">%&gt;%</span></span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>      <span class="fu">unnest</span>(path_data)</span>
+<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plot edges map with discrete colors</span></span>
+<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_path</span>(<span class="at">data =</span> edges_curved,</span>
+<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a>                <span class="fu">aes</span>(<span class="at">x =</span> lon, <span class="at">y =</span> lat, </span>
+<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a>                    <span class="at">group =</span> <span class="fu">interaction</span>(uni1, uni2),</span>
+<span id="cb27-61"><a href="#cb27-61" aria-hidden="true" tabindex="-1"></a>                    <span class="at">color =</span> weight_factor, <span class="at">size =</span> weight),</span>
+<span id="cb27-62"><a href="#cb27-62" aria-hidden="true" tabindex="-1"></a>                <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb27-63"><a href="#cb27-63" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(<span class="at">data =</span> gen26_data<span class="sc">$</span>uni_coords,</span>
+<span id="cb27-64"><a href="#cb27-64" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> longitude, <span class="at">y =</span> latitude),</span>
+<span id="cb27-65"><a href="#cb27-65" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">4</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_text</span>(<span class="at">data =</span> gen26_data<span class="sc">$</span>uni_coords,</span>
+<span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a>                <span class="fu">aes</span>(<span class="at">x =</span> longitude, <span class="at">y =</span> latitude, <span class="at">label =</span> affil),</span>
+<span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a>                <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
+<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a>      <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Blues"</span>, <span class="at">direction =</span> <span class="dv">1</span>, </span>
+<span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a>                         <span class="at">name =</span> <span class="st">"Collaborations"</span>) <span class="sc">+</span></span>
+<span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a>      <span class="fu">scale_size_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>), <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb27-73"><a href="#cb27-73" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme</span>(<span class="at">axis.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb27-74"><a href="#cb27-74" aria-hidden="true" tabindex="-1"></a>            <span class="at">axis.text =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb27-75"><a href="#cb27-75" aria-hidden="true" tabindex="-1"></a>            <span class="at">panel.grid =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb27-76"><a href="#cb27-76" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"GEN26 University Collaboration Network - Edges and Weights"</span>,</span>
+<span id="cb27-77"><a href="#cb27-77" aria-hidden="true" tabindex="-1"></a>           <span class="at">subtitle =</span> <span class="st">"Edge thickness and color represent collaboration intensity"</span>)</span>
+<span id="cb27-78"><a href="#cb27-78" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb27-79"><a href="#cb27-79" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-80"><a href="#cb27-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-81"><a href="#cb27-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-82"><a href="#cb27-82" aria-hidden="true" tabindex="-1"></a><span class="co"># Original network visualization</span></span>
+<span id="cb27-83"><a href="#cb27-83" aria-hidden="true" tabindex="-1"></a>visualize_core_periphery <span class="ot">&lt;-</span> <span class="cf">function</span>(network, cp_result) {</span>
+<span id="cb27-84"><a href="#cb27-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-85"><a href="#cb27-85" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Set node colors based on core-periphery assignment</span></span>
+<span id="cb27-86"><a href="#cb27-86" aria-hidden="true" tabindex="-1"></a>  node_colors <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(cp_result<span class="sc">$</span>consensus<span class="sc">$</span>Consensus_Role <span class="sc">==</span> <span class="st">"CORE"</span>, <span class="st">"red"</span>, <span class="st">"lightblue"</span>)</span>
+<span id="cb27-87"><a href="#cb27-87" aria-hidden="true" tabindex="-1"></a>  node_sizes <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(cp_result<span class="sc">$</span>consensus<span class="sc">$</span>Consensus_Role <span class="sc">==</span> <span class="st">"CORE"</span>, <span class="dv">20</span>, <span class="dv">15</span>)</span>
+<span id="cb27-88"><a href="#cb27-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-89"><a href="#cb27-89" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plot network</span></span>
+<span id="cb27-90"><a href="#cb27-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(network,</span>
+<span id="cb27-91"><a href="#cb27-91" aria-hidden="true" tabindex="-1"></a>       <span class="at">vertex.color =</span> node_colors,</span>
+<span id="cb27-92"><a href="#cb27-92" aria-hidden="true" tabindex="-1"></a>       <span class="at">vertex.size =</span> node_sizes,</span>
+<span id="cb27-93"><a href="#cb27-93" aria-hidden="true" tabindex="-1"></a>       <span class="at">vertex.label =</span> <span class="fu">V</span>(network)<span class="sc">$</span>name,</span>
+<span id="cb27-94"><a href="#cb27-94" aria-hidden="true" tabindex="-1"></a>       <span class="at">vertex.label.cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb27-95"><a href="#cb27-95" aria-hidden="true" tabindex="-1"></a>       <span class="at">vertex.label.color =</span> <span class="st">"black"</span>,</span>
+<span id="cb27-96"><a href="#cb27-96" aria-hidden="true" tabindex="-1"></a>       <span class="at">edge.width =</span> <span class="dv">2</span>,</span>
+<span id="cb27-97"><a href="#cb27-97" aria-hidden="true" tabindex="-1"></a>       <span class="at">edge.color =</span> <span class="st">"gray"</span>,</span>
+<span id="cb27-98"><a href="#cb27-98" aria-hidden="true" tabindex="-1"></a>       <span class="at">layout =</span> <span class="fu">layout_with_fr</span>(network),</span>
+<span id="cb27-99"><a href="#cb27-99" aria-hidden="true" tabindex="-1"></a>       <span class="at">main =</span> <span class="st">"GEN26 Universities: Core-Periphery Structure</span><span class="sc">\n</span><span class="st">(Red = Core, Blue = Periphery)"</span>)</span>
+<span id="cb27-100"><a href="#cb27-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-101"><a href="#cb27-101" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add legend</span></span>
+<span id="cb27-102"><a href="#cb27-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">"topright"</span>, </span>
+<span id="cb27-103"><a href="#cb27-103" aria-hidden="true" tabindex="-1"></a>         <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"Core"</span>, <span class="st">"Periphery"</span>), </span>
+<span id="cb27-104"><a href="#cb27-104" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"red"</span>, <span class="st">"lightblue"</span>), </span>
+<span id="cb27-105"><a href="#cb27-105" aria-hidden="true" tabindex="-1"></a>         <span class="at">pch =</span> <span class="dv">19</span>, </span>
+<span id="cb27-106"><a href="#cb27-106" aria-hidden="true" tabindex="-1"></a>         <span class="at">cex =</span> <span class="fl">0.8</span>)</span>
+<span id="cb27-107"><a href="#cb27-107" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-108"><a href="#cb27-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-109"><a href="#cb27-109" aria-hidden="true" tabindex="-1"></a><span class="co"># Create all visualizations</span></span>
+<span id="cb27-110"><a href="#cb27-110" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== CREATING VISUALIZATIONS ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== CREATING VISUALIZATIONS ===</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Original core-periphery network plot</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">visualize_core_periphery</span>(gen26_network, cp_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="network_analysis_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Edges and weights map</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>edges_map <span class="ot">&lt;-</span> <span class="fu">create_edges_map</span>(gen26_data, cp_results)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(edges_map)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="network_analysis_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Export summary data</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>network_summary <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">total_universities =</span> <span class="fu">length</span>(TARGET_UNIVERSITIES),</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">active_collaborations =</span> <span class="fu">nrow</span>(gen26_data<span class="sc">$</span>edge_weights),</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">total_collaborative_papers =</span> <span class="fu">sum</span>(gen26_data<span class="sc">$</span>edge_weights<span class="sc">$</span>weight),</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">core_universities =</span> <span class="fu">sum</span>(cp_results<span class="sc">$</span>consensus<span class="sc">$</span>Consensus_Role <span class="sc">==</span> <span class="st">"CORE"</span>),</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">periphery_universities =</span> <span class="fu">sum</span>(cp_results<span class="sc">$</span>consensus<span class="sc">$</span>Consensus_Role <span class="sc">==</span> <span class="st">"PERIPHERY"</span>)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== NETWORK SUMMARY ===</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+=== NETWORK SUMMARY ===</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(network_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>$total_universities
+[1] 5
+
+$active_collaborations
+[1] 3
+
+$total_collaborative_papers
+[1] 118
+
+$core_universities
+[1] 3
+
+$periphery_universities
+[1] 2</code></pre>
+</div>
+</div>
+</section>
+<section id="network-figure-visualized" class="level3" data-number="0.3">
+<h3 data-number="0.3" class="anchored" data-anchor-id="network-figure-visualized"><span class="header-section-number">0.3</span> Network figure visualized</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(maps)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidygeocoder)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>c_preview <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"c_preview.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>c_preview_geocoded <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"c_preview_geocoded.csv"</span>, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Create collaboration pairs</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>collab_pairs <span class="ot">&lt;-</span> c_preview <span class="sc">%&gt;%</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(eid, affil) <span class="sc">%&gt;%</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(eid) <span class="sc">%&gt;%</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do</span>({</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>    unis <span class="ot">&lt;-</span> .<span class="sc">$</span>affil</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">length</span>(unis) <span class="sc">&gt;=</span> <span class="dv">2</span>) {</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expand.grid</span>(<span class="at">uni1 =</span> unis, <span class="at">uni2 =</span> unis, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(uni1 <span class="sc">&lt;</span> uni2)</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>      <span class="fu">data.frame</span>(<span class="at">uni1 =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">uni2 =</span> <span class="fu">character</span>(<span class="dv">0</span>))</span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>  }) <span class="sc">%&gt;%</span></span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Count collaboration weights</span></span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>edge_weights <span class="ot">&lt;-</span> collab_pairs <span class="sc">%&gt;%</span></span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(uni1, uni2, <span class="at">name =</span> <span class="st">"weight"</span>)</span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract universities that actually have collaborations</span></span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>active_universities <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(edge_weights<span class="sc">$</span>uni1, edge_weights<span class="sc">$</span>uni2))</span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify missing universities from geocoded data</span></span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a>existing_unis <span class="ot">&lt;-</span> c_preview_geocoded<span class="sc">$</span>affil</span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a>missing_unis <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(active_universities, existing_unis)</span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Geocode missing universities using OSM</span></span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">length</span>(missing_unis) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Geocoding missing universities:"</span>, <span class="fu">paste</span>(missing_unis, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a>  missing_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">affil =</span> missing_unis, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a>  geocoded_missing <span class="ot">&lt;-</span> missing_df <span class="sc">%&gt;%</span></span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geocode</span>(<span class="at">address =</span> affil, <span class="at">method =</span> <span class="st">"osm"</span>, <span class="at">lat =</span> latitude, <span class="at">long =</span> longitude)</span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Merge with existing geocoded data</span></span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a>  c_preview_geocoded <span class="ot">&lt;-</span> c_preview_geocoded <span class="sc">%&gt;%</span></span>
+<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_rows</span>(geocoded_missing) <span class="sc">%&gt;%</span></span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(affil, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Geocoding complete!</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb35-54"><a href="#cb35-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(geocoded_missing)</span>
+<span id="cb35-55"><a href="#cb35-55" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-56"><a href="#cb35-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-57"><a href="#cb35-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Get coordinates only for universities with collaborations</span></span>
+<span id="cb35-58"><a href="#cb35-58" aria-hidden="true" tabindex="-1"></a>uni_coords <span class="ot">&lt;-</span> c_preview_geocoded <span class="sc">%&gt;%</span></span>
+<span id="cb35-59"><a href="#cb35-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(affil, latitude, longitude) <span class="sc">%&gt;%</span></span>
+<span id="cb35-60"><a href="#cb35-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-61"><a href="#cb35-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(affil <span class="sc">%in%</span> active_universities)</span>
+<span id="cb35-62"><a href="#cb35-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-63"><a href="#cb35-63" aria-hidden="true" tabindex="-1"></a><span class="co"># Create igraph with only active universities</span></span>
+<span id="cb35-64"><a href="#cb35-64" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">make_empty_graph</span>(<span class="at">n =</span> <span class="dv">0</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">add_vertices</span>(g, <span class="fu">length</span>(active_universities), <span class="at">name =</span> active_universities)</span>
+<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a><span class="co"># Add coordinates as vertex attributes</span></span>
+<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(active_universities)) {</span>
+<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a>  uni_name <span class="ot">&lt;-</span> active_universities[i]</span>
+<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a>  coords <span class="ot">&lt;-</span> uni_coords[uni_coords<span class="sc">$</span>affil <span class="sc">==</span> uni_name, ]</span>
+<span id="cb35-71"><a href="#cb35-71" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(coords) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb35-72"><a href="#cb35-72" aria-hidden="true" tabindex="-1"></a>    <span class="fu">V</span>(g)[uni_name]<span class="sc">$</span>latitude <span class="ot">&lt;-</span> coords<span class="sc">$</span>latitude[<span class="dv">1</span>]</span>
+<span id="cb35-73"><a href="#cb35-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">V</span>(g)[uni_name]<span class="sc">$</span>longitude <span class="ot">&lt;-</span> coords<span class="sc">$</span>longitude[<span class="dv">1</span>]</span>
+<span id="cb35-74"><a href="#cb35-74" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb35-75"><a href="#cb35-75" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-76"><a href="#cb35-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-77"><a href="#cb35-77" aria-hidden="true" tabindex="-1"></a><span class="co"># Add edges</span></span>
+<span id="cb35-78"><a href="#cb35-78" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">nrow</span>(edge_weights) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb35-79"><a href="#cb35-79" aria-hidden="true" tabindex="-1"></a>  edge_list <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(edge_weights[, <span class="fu">c</span>(<span class="st">"uni1"</span>, <span class="st">"uni2"</span>)])</span>
+<span id="cb35-80"><a href="#cb35-80" aria-hidden="true" tabindex="-1"></a>  g <span class="ot">&lt;-</span> <span class="fu">add_edges</span>(g, <span class="fu">t</span>(edge_list))</span>
+<span id="cb35-81"><a href="#cb35-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">E</span>(g)<span class="sc">$</span>weight <span class="ot">&lt;-</span> edge_weights<span class="sc">$</span>weight</span>
+<span id="cb35-82"><a href="#cb35-82" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-83"><a href="#cb35-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-84"><a href="#cb35-84" aria-hidden="true" tabindex="-1"></a><span class="co"># Create map-based visualization</span></span>
+<span id="cb35-85"><a href="#cb35-85" aria-hidden="true" tabindex="-1"></a>create_map_network <span class="ot">&lt;-</span> <span class="cf">function</span>(graph, uni_coords) {</span>
+<span id="cb35-86"><a href="#cb35-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-87"><a href="#cb35-87" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get map boundaries with padding</span></span>
+<span id="cb35-88"><a href="#cb35-88" aria-hidden="true" tabindex="-1"></a>  lat_range <span class="ot">&lt;-</span> <span class="fu">range</span>(uni_coords<span class="sc">$</span>latitude, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb35-89"><a href="#cb35-89" aria-hidden="true" tabindex="-1"></a>  lon_range <span class="ot">&lt;-</span> <span class="fu">range</span>(uni_coords<span class="sc">$</span>longitude, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb35-90"><a href="#cb35-90" aria-hidden="true" tabindex="-1"></a>  lat_pad <span class="ot">&lt;-</span> <span class="fu">diff</span>(lat_range) <span class="sc">*</span> <span class="fl">0.3</span></span>
+<span id="cb35-91"><a href="#cb35-91" aria-hidden="true" tabindex="-1"></a>  lon_pad <span class="ot">&lt;-</span> <span class="fu">diff</span>(lon_range) <span class="sc">*</span> <span class="fl">0.3</span></span>
+<span id="cb35-92"><a href="#cb35-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-93"><a href="#cb35-93" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get world map data</span></span>
+<span id="cb35-94"><a href="#cb35-94" aria-hidden="true" tabindex="-1"></a>  world_map <span class="ot">&lt;-</span> <span class="fu">map_data</span>(<span class="st">"world"</span>)</span>
+<span id="cb35-95"><a href="#cb35-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-96"><a href="#cb35-96" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filter map for Italian region</span></span>
+<span id="cb35-97"><a href="#cb35-97" aria-hidden="true" tabindex="-1"></a>  region_countries <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Italy"</span>, <span class="st">"Switzerland"</span>, <span class="st">"Austria"</span>, <span class="st">"France"</span>, <span class="st">"Slovenia"</span>, <span class="st">"Croatia"</span>)</span>
+<span id="cb35-98"><a href="#cb35-98" aria-hidden="true" tabindex="-1"></a>  region_map <span class="ot">&lt;-</span> world_map <span class="sc">%&gt;%</span></span>
+<span id="cb35-99"><a href="#cb35-99" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(region <span class="sc">%in%</span> region_countries)</span>
+<span id="cb35-100"><a href="#cb35-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-101"><a href="#cb35-101" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prepare edge data</span></span>
+<span id="cb35-102"><a href="#cb35-102" aria-hidden="true" tabindex="-1"></a>  edge_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb35-103"><a href="#cb35-103" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">ecount</span>(graph) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb35-104"><a href="#cb35-104" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">ecount</span>(graph)) {</span>
+<span id="cb35-105"><a href="#cb35-105" aria-hidden="true" tabindex="-1"></a>      edge <span class="ot">&lt;-</span> <span class="fu">ends</span>(graph, i)</span>
+<span id="cb35-106"><a href="#cb35-106" aria-hidden="true" tabindex="-1"></a>      v1 <span class="ot">&lt;-</span> edge[<span class="dv">1</span>]</span>
+<span id="cb35-107"><a href="#cb35-107" aria-hidden="true" tabindex="-1"></a>      v2 <span class="ot">&lt;-</span> edge[<span class="dv">2</span>]</span>
+<span id="cb35-108"><a href="#cb35-108" aria-hidden="true" tabindex="-1"></a>      edge_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(edge_data, <span class="fu">data.frame</span>(</span>
+<span id="cb35-109"><a href="#cb35-109" aria-hidden="true" tabindex="-1"></a>        <span class="at">x =</span> <span class="fu">V</span>(graph)[v1]<span class="sc">$</span>longitude,</span>
+<span id="cb35-110"><a href="#cb35-110" aria-hidden="true" tabindex="-1"></a>        <span class="at">y =</span> <span class="fu">V</span>(graph)[v1]<span class="sc">$</span>latitude,</span>
+<span id="cb35-111"><a href="#cb35-111" aria-hidden="true" tabindex="-1"></a>        <span class="at">xend =</span> <span class="fu">V</span>(graph)[v2]<span class="sc">$</span>longitude,</span>
+<span id="cb35-112"><a href="#cb35-112" aria-hidden="true" tabindex="-1"></a>        <span class="at">yend =</span> <span class="fu">V</span>(graph)[v2]<span class="sc">$</span>latitude,</span>
+<span id="cb35-113"><a href="#cb35-113" aria-hidden="true" tabindex="-1"></a>        <span class="at">weight =</span> <span class="fu">E</span>(graph)<span class="sc">$</span>weight[i]</span>
+<span id="cb35-114"><a href="#cb35-114" aria-hidden="true" tabindex="-1"></a>      ))</span>
+<span id="cb35-115"><a href="#cb35-115" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb35-116"><a href="#cb35-116" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb35-117"><a href="#cb35-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-118"><a href="#cb35-118" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create plot</span></span>
+<span id="cb35-119"><a href="#cb35-119" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb35-120"><a href="#cb35-120" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_polygon</span>(<span class="at">data =</span> region_map, </span>
+<span id="cb35-121"><a href="#cb35-121" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">aes</span>(<span class="at">x =</span> long, <span class="at">y =</span> lat, <span class="at">group =</span> group),</span>
+<span id="cb35-122"><a href="#cb35-122" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"gray90"</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb35-123"><a href="#cb35-123" aria-hidden="true" tabindex="-1"></a>    {<span class="cf">if</span>(<span class="fu">nrow</span>(edge_data) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb35-124"><a href="#cb35-124" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_segment</span>(<span class="at">data =</span> edge_data,</span>
+<span id="cb35-125"><a href="#cb35-125" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend, </span>
+<span id="cb35-126"><a href="#cb35-126" aria-hidden="true" tabindex="-1"></a>                       <span class="at">linewidth =</span> weight, <span class="at">alpha =</span> weight),</span>
+<span id="cb35-127"><a href="#cb35-127" aria-hidden="true" tabindex="-1"></a>                   <span class="at">color =</span> <span class="st">"blue"</span>)</span>
+<span id="cb35-128"><a href="#cb35-128" aria-hidden="true" tabindex="-1"></a>    }} <span class="sc">+</span></span>
+<span id="cb35-129"><a href="#cb35-129" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">data =</span> uni_coords,</span>
+<span id="cb35-130"><a href="#cb35-130" aria-hidden="true" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> longitude, <span class="at">y =</span> latitude),</span>
+<span id="cb35-131"><a href="#cb35-131" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="dv">5</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb35-132"><a href="#cb35-132" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="at">data =</span> uni_coords,</span>
+<span id="cb35-133"><a href="#cb35-133" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">x =</span> longitude, <span class="at">y =</span> latitude, <span class="at">label =</span> affil),</span>
+<span id="cb35-134"><a href="#cb35-134" aria-hidden="true" tabindex="-1"></a>              <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.8</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>) <span class="sc">+</span></span>
+<span id="cb35-135"><a href="#cb35-135" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_linewidth_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">3</span>), <span class="at">name =</span> <span class="st">"Collaborations"</span>) <span class="sc">+</span></span>
+<span id="cb35-136"><a href="#cb35-136" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_alpha_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">1.0</span>), <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb35-137"><a href="#cb35-137" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_fixed</span>(<span class="fl">1.3</span>, </span>
+<span id="cb35-138"><a href="#cb35-138" aria-hidden="true" tabindex="-1"></a>                <span class="at">xlim =</span> <span class="fu">c</span>(lon_range[<span class="dv">1</span>] <span class="sc">-</span> lon_pad, lon_range[<span class="dv">2</span>] <span class="sc">+</span> lon_pad),</span>
+<span id="cb35-139"><a href="#cb35-139" aria-hidden="true" tabindex="-1"></a>                <span class="at">ylim =</span> <span class="fu">c</span>(lat_range[<span class="dv">1</span>] <span class="sc">-</span> lat_pad, lat_range[<span class="dv">2</span>] <span class="sc">+</span> lat_pad)) <span class="sc">+</span></span>
+<span id="cb35-140"><a href="#cb35-140" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb35-141"><a href="#cb35-141" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">panel.grid.major =</span> <span class="fu">element_line</span>(<span class="at">color =</span> <span class="st">"gray95"</span>, <span class="at">linewidth =</span> <span class="fl">0.2</span>),</span>
+<span id="cb35-142"><a href="#cb35-142" aria-hidden="true" tabindex="-1"></a>          <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"aliceblue"</span>),</span>
+<span id="cb35-143"><a href="#cb35-143" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.title =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb35-144"><a href="#cb35-144" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"GEN26 University Collaboration Network"</span>,</span>
+<span id="cb35-145"><a href="#cb35-145" aria-hidden="true" tabindex="-1"></a>         <span class="at">subtitle =</span> <span class="st">"Universities with active collaborations | Edge thickness = collaboration weight"</span>)</span>
+<span id="cb35-146"><a href="#cb35-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-147"><a href="#cb35-147" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(p)</span>
+<span id="cb35-148"><a href="#cb35-148" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-149"><a href="#cb35-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-150"><a href="#cb35-150" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate visualization</span></span>
+<span id="cb35-151"><a href="#cb35-151" aria-hidden="true" tabindex="-1"></a>map_plot <span class="ot">&lt;-</span> <span class="fu">create_map_network</span>(g, uni_coords)</span>
+<span id="cb35-152"><a href="#cb35-152" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(map_plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="network_analysis_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Network summary</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Network Summary:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Network Summary:</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Total universities in network:"</span>, <span class="fu">vcount</span>(g), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total universities in network: 3 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Active collaborations:"</span>, <span class="fu">ecount</span>(g), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Active collaborations: 3 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">ecount</span>(g) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Total collaborative papers:"</span>, <span class="fu">sum</span>(<span class="fu">E</span>(g)<span class="sc">$</span>weight), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total collaborative papers: 118 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Universities in Network:</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Universities in Network:</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(uni_coords)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                 affil latitude longitude
+1                Politecnico di Milano 45.47903  9.232210
+2                   Università Bocconi 45.44988  9.189264
+3 Università Cattolica del Sacro Cuore 45.46185  9.177056</code></pre>
+</div>
+</div>
+</section>
+<section id="bar-chart" class="level3" data-number="0.4">
+<h3 data-number="0.4" class="anchored" data-anchor-id="bar-chart"><span class="header-section-number">0.4</span> Bar Chart</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create edge list from collaboration data</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>collab_pairs <span class="ot">&lt;-</span> c_preview <span class="sc">%&gt;%</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(eid, affil) <span class="sc">%&gt;%</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(eid) <span class="sc">%&gt;%</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do</span>({</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>    unis <span class="ot">&lt;-</span> .<span class="sc">$</span>affil</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="fu">length</span>(unis) <span class="sc">&gt;=</span> <span class="dv">2</span>) {</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">expand.grid</span>(<span class="at">uni1 =</span> unis, <span class="at">uni2 =</span> unis, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(uni1 <span class="sc">&lt;</span> uni2)</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">data.frame</span>(<span class="at">uni1 =</span> <span class="fu">character</span>(<span class="dv">0</span>), <span class="at">uni2 =</span> <span class="fu">character</span>(<span class="dv">0</span>))</span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>  }) <span class="sc">%&gt;%</span></span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(uni1, uni2, <span class="at">name =</span> <span class="st">"weight"</span>)</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Create network graph</span></span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(collab_pairs, <span class="at">directed =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>                           <span class="at">vertices =</span> <span class="fu">data.frame</span>(<span class="at">name =</span> TARGET_UNIVERSITIES))</span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a><span class="fu">E</span>(g)<span class="sc">$</span>weight <span class="ot">&lt;-</span> collab_pairs<span class="sc">$</span>weight</span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate node metrics</span></span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>node_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">University =</span> <span class="fu">V</span>(g)<span class="sc">$</span>name,</span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">Degree =</span> <span class="fu">degree</span>(g),</span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">Betweenness =</span> <span class="fu">betweenness</span>(g, <span class="at">weights =</span> <span class="cn">NA</span>),</span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">Collaborations =</span> <span class="fu">strength</span>(g)</span>
+<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Collaborations =</span> <span class="fu">as.factor</span>(Collaborations)) <span class="sc">%&gt;%</span></span>
+<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Degree))</span>
+<span id="cb48-36"><a href="#cb48-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-37"><a href="#cb48-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Create visualization with discrete colors</span></span>
+<span id="cb48-38"><a href="#cb48-38" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(node_data, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(University, Degree), <span class="at">y =</span> Degree)) <span class="sc">+</span></span>
+<span id="cb48-39"><a href="#cb48-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Collaborations), <span class="at">width =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb48-40"><a href="#cb48-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> Degree), <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span> <span class="fl">3.5</span>) <span class="sc">+</span></span>
+<span id="cb48-41"><a href="#cb48-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Blues"</span>, <span class="at">direction =</span> <span class="dv">1</span>,</span>
+<span id="cb48-42"><a href="#cb48-42" aria-hidden="true" tabindex="-1"></a>                    <span class="at">name =</span> <span class="st">"Total</span><span class="sc">\n</span><span class="st">Collaborations"</span>) <span class="sc">+</span></span>
+<span id="cb48-43"><a href="#cb48-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb48-44"><a href="#cb48-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb48-45"><a href="#cb48-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"University Collaboration Network Metrics"</span>,</span>
+<span id="cb48-46"><a href="#cb48-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Number of partner institutions and total collaborative publications"</span>,</span>
+<span id="cb48-47"><a href="#cb48-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb48-48"><a href="#cb48-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of Partner Universities (Degree)"</span></span>
+<span id="cb48-49"><a href="#cb48-49" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb48-50"><a href="#cb48-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">11</span>) <span class="sc">+</span></span>
+<span id="cb48-51"><a href="#cb48-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb48-52"><a href="#cb48-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">14</span>),</span>
+<span id="cb48-53"><a href="#cb48-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>, <span class="at">color =</span> <span class="st">"gray40"</span>),</span>
+<span id="cb48-54"><a href="#cb48-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb48-55"><a href="#cb48-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb48-56"><a href="#cb48-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"right"</span></span>
+<span id="cb48-57"><a href="#cb48-57" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb48-58"><a href="#cb48-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.15</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="network_analysis_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="export-for-gephi" class="level3" data-number="0.5">
+<h3 data-number="0.5" class="anchored" data-anchor-id="export-for-gephi"><span class="header-section-number">0.5</span> Export for Gephi</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Complete Gephi Export Code for GEN26 Network</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to create Gephi-ready files</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>export_gephi_files <span class="ot">&lt;-</span> <span class="cf">function</span>(gen26_data, cp_results, <span class="at">output_dir =</span> <span class="st">"gephi_export"</span>) {</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create output directory</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(output_dir)) {</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dir.create</span>(output_dir)</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1. CREATE NODES FILE</span></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Gephi requires: Id, Label columns (minimum)</span></span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Additional columns become node attributes</span></span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a>  nodes_data <span class="ot">&lt;-</span> gen26_data<span class="sc">$</span>uni_coords <span class="sc">%&gt;%</span></span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(cp_results<span class="sc">$</span>consensus, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"affil"</span> <span class="ot">=</span> <span class="st">"University"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Required columns for Gephi</span></span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">Id =</span> affil,  <span class="co"># Unique identifier</span></span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">Label =</span> affil,  <span class="co"># Display name</span></span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Core-Periphery attributes</span></span>
+<span id="cb49-24"><a href="#cb49-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">Consensus_Role =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Consensus_Role), <span class="st">"PERIPHERY"</span>, Consensus_Role),</span>
+<span id="cb49-25"><a href="#cb49-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">Core_Votes =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Core_Votes), <span class="dv">0</span>, Core_Votes),</span>
+<span id="cb49-26"><a href="#cb49-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-27"><a href="#cb49-27" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Geographic attributes</span></span>
+<span id="cb49-28"><a href="#cb49-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">Latitude =</span> latitude,</span>
+<span id="cb49-29"><a href="#cb49-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">Longitude =</span> longitude,</span>
+<span id="cb49-30"><a href="#cb49-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-31"><a href="#cb49-31" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Network attributes (calculate from edges)</span></span>
+<span id="cb49-32"><a href="#cb49-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">Degree =</span> <span class="dv">0</span>,  <span class="co"># Will be calculated by Gephi</span></span>
+<span id="cb49-33"><a href="#cb49-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-34"><a href="#cb49-34" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Visual attributes for Gephi</span></span>
+<span id="cb49-35"><a href="#cb49-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">Role_Numeric =</span> <span class="fu">ifelse</span>(Consensus_Role <span class="sc">==</span> <span class="st">"CORE"</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb49-36"><a href="#cb49-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">Node_Size =</span> <span class="fu">ifelse</span>(Consensus_Role <span class="sc">==</span> <span class="st">"CORE"</span>, <span class="dv">20</span>, <span class="dv">15</span>)</span>
+<span id="cb49-37"><a href="#cb49-37" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb49-38"><a href="#cb49-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Id, Label, Consensus_Role, Core_Votes, Latitude, Longitude, </span>
+<span id="cb49-39"><a href="#cb49-39" aria-hidden="true" tabindex="-1"></a>           Role_Numeric, Node_Size)</span>
+<span id="cb49-40"><a href="#cb49-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-41"><a href="#cb49-41" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add degree calculations from your network data</span></span>
+<span id="cb49-42"><a href="#cb49-42" aria-hidden="true" tabindex="-1"></a>  degree_counts <span class="ot">&lt;-</span> gen26_data<span class="sc">$</span>edge_weights <span class="sc">%&gt;%</span></span>
+<span id="cb49-43"><a href="#cb49-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(uni1, uni2), <span class="at">names_to =</span> <span class="st">"position"</span>, <span class="at">values_to =</span> <span class="st">"university"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb49-44"><a href="#cb49-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(university) <span class="sc">%&gt;%</span></span>
+<span id="cb49-45"><a href="#cb49-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">Degree =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb49-46"><a href="#cb49-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-47"><a href="#cb49-47" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Merge degree counts</span></span>
+<span id="cb49-48"><a href="#cb49-48" aria-hidden="true" tabindex="-1"></a>  nodes_data <span class="ot">&lt;-</span> nodes_data <span class="sc">%&gt;%</span></span>
+<span id="cb49-49"><a href="#cb49-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(degree_counts, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Id"</span> <span class="ot">=</span> <span class="st">"university"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb49-50"><a href="#cb49-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Degree =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Degree), <span class="dv">0</span>, Degree))</span>
+<span id="cb49-51"><a href="#cb49-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-52"><a href="#cb49-52" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2. CREATE EDGES FILE  </span></span>
+<span id="cb49-53"><a href="#cb49-53" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Gephi requires: Source, Target columns (minimum)</span></span>
+<span id="cb49-54"><a href="#cb49-54" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Additional columns become edge attributes</span></span>
+<span id="cb49-55"><a href="#cb49-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-56"><a href="#cb49-56" aria-hidden="true" tabindex="-1"></a>  edges_data <span class="ot">&lt;-</span> gen26_data<span class="sc">$</span>edge_weights <span class="sc">%&gt;%</span></span>
+<span id="cb49-57"><a href="#cb49-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb49-58"><a href="#cb49-58" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Required columns for Gephi</span></span>
+<span id="cb49-59"><a href="#cb49-59" aria-hidden="true" tabindex="-1"></a>      <span class="at">Source =</span> uni1,</span>
+<span id="cb49-60"><a href="#cb49-60" aria-hidden="true" tabindex="-1"></a>      <span class="at">Target =</span> uni2,</span>
+<span id="cb49-61"><a href="#cb49-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-62"><a href="#cb49-62" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Edge attributes</span></span>
+<span id="cb49-63"><a href="#cb49-63" aria-hidden="true" tabindex="-1"></a>      <span class="at">Weight =</span> weight,</span>
+<span id="cb49-64"><a href="#cb49-64" aria-hidden="true" tabindex="-1"></a>      <span class="at">Type =</span> <span class="st">"Undirected"</span>,  <span class="co"># Specify edge type</span></span>
+<span id="cb49-65"><a href="#cb49-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-66"><a href="#cb49-66" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Visual attributes</span></span>
+<span id="cb49-67"><a href="#cb49-67" aria-hidden="true" tabindex="-1"></a>      <span class="at">Edge_Color =</span> <span class="st">"blue"</span>,</span>
+<span id="cb49-68"><a href="#cb49-68" aria-hidden="true" tabindex="-1"></a>      <span class="at">Edge_Thickness =</span> weight <span class="sc">*</span> <span class="dv">2</span></span>
+<span id="cb49-69"><a href="#cb49-69" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb49-70"><a href="#cb49-70" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Source, Target, Weight, Type, Edge_Color, Edge_Thickness)</span>
+<span id="cb49-71"><a href="#cb49-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-72"><a href="#cb49-72" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 3. EXPORT FILES</span></span>
+<span id="cb49-73"><a href="#cb49-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-74"><a href="#cb49-74" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Export nodes (CSV format required by Gephi)</span></span>
+<span id="cb49-75"><a href="#cb49-75" aria-hidden="true" tabindex="-1"></a>  nodes_file <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_dir, <span class="st">"gen26_nodes.csv"</span>)</span>
+<span id="cb49-76"><a href="#cb49-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write.csv</span>(nodes_data, nodes_file, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb49-77"><a href="#cb49-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-78"><a href="#cb49-78" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Export edges (CSV format required by Gephi)</span></span>
+<span id="cb49-79"><a href="#cb49-79" aria-hidden="true" tabindex="-1"></a>  edges_file <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_dir, <span class="st">"gen26_edges.csv"</span>)</span>
+<span id="cb49-80"><a href="#cb49-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write.csv</span>(edges_data, edges_file, <span class="at">row.names =</span> <span class="cn">FALSE</span>, <span class="at">quote =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb49-81"><a href="#cb49-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-82"><a href="#cb49-82" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 4. CREATE SUMMARY REPORT</span></span>
+<span id="cb49-83"><a href="#cb49-83" aria-hidden="true" tabindex="-1"></a>  summary_report <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb49-84"><a href="#cb49-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_nodes =</span> <span class="fu">nrow</span>(nodes_data),</span>
+<span id="cb49-85"><a href="#cb49-85" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_edges =</span> <span class="fu">nrow</span>(edges_data),</span>
+<span id="cb49-86"><a href="#cb49-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">core_universities =</span> <span class="fu">sum</span>(nodes_data<span class="sc">$</span>Consensus_Role <span class="sc">==</span> <span class="st">"CORE"</span>),</span>
+<span id="cb49-87"><a href="#cb49-87" aria-hidden="true" tabindex="-1"></a>    <span class="at">periphery_universities =</span> <span class="fu">sum</span>(nodes_data<span class="sc">$</span>Consensus_Role <span class="sc">==</span> <span class="st">"PERIPHERY"</span>),</span>
+<span id="cb49-88"><a href="#cb49-88" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_collaborations =</span> <span class="fu">sum</span>(edges_data<span class="sc">$</span>Weight),</span>
+<span id="cb49-89"><a href="#cb49-89" aria-hidden="true" tabindex="-1"></a>    <span class="at">files_created =</span> <span class="fu">c</span>(nodes_file, edges_file)</span>
+<span id="cb49-90"><a href="#cb49-90" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb49-91"><a href="#cb49-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-92"><a href="#cb49-92" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Print summary</span></span>
+<span id="cb49-93"><a href="#cb49-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"=== GEPHI EXPORT SUMMARY ===</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb49-94"><a href="#cb49-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Nodes file:"</span>, nodes_file, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb49-95"><a href="#cb49-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Edges file:"</span>, edges_file, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb49-96"><a href="#cb49-96" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Total nodes:"</span>, summary_report<span class="sc">$</span>total_nodes, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb49-97"><a href="#cb49-97" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Total edges:"</span>, summary_report<span class="sc">$</span>total_edges, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb49-98"><a href="#cb49-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Core universities:"</span>, summary_report<span class="sc">$</span>core_universities, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb49-99"><a href="#cb49-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Periphery universities:"</span>, summary_report<span class="sc">$</span>periphery_universities, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb49-100"><a href="#cb49-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Total collaborations:"</span>, summary_report<span class="sc">$</span>total_collaborations, <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb49-101"><a href="#cb49-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-102"><a href="#cb49-102" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Show first few rows</span></span>
+<span id="cb49-103"><a href="#cb49-103" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"NODES FILE PREVIEW:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb49-104"><a href="#cb49-104" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">head</span>(nodes_data, <span class="dv">3</span>))</span>
+<span id="cb49-105"><a href="#cb49-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">EDGES FILE PREVIEW:</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb49-106"><a href="#cb49-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">head</span>(edges_data, <span class="dv">3</span>))</span>
+<span id="cb49-107"><a href="#cb49-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-108"><a href="#cb49-108" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(summary_report)</span>
+<span id="cb49-109"><a href="#cb49-109" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb49-110"><a href="#cb49-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-111"><a href="#cb49-111" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute the export</span></span>
+<span id="cb49-112"><a href="#cb49-112" aria-hidden="true" tabindex="-1"></a>gephi_export <span class="ot">&lt;-</span> <span class="fu">export_gephi_files</span>(gen26_data, cp_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== GEPHI EXPORT SUMMARY ===
+Nodes file: gephi_export/gen26_nodes.csv 
+Edges file: gephi_export/gen26_edges.csv 
+Total nodes: 3 
+Total edges: 3 
+Core universities: 3 
+Periphery universities: 0 
+Total collaborations: 118 
+
+NODES FILE PREVIEW:
+                                    Id                                Label
+1                Politecnico di Milano                Politecnico di Milano
+2                   Università Bocconi                   Università Bocconi
+3 Università Cattolica del Sacro Cuore Università Cattolica del Sacro Cuore
+  Consensus_Role Core_Votes Latitude Longitude Role_Numeric Node_Size Degree
+1           CORE          3 45.47903  9.232210            1        20      2
+2           CORE          2 45.44988  9.189264            1        20      2
+3           CORE          2 45.46185  9.177056            1        20      2
+
+EDGES FILE PREVIEW:
+# A tibble: 3 × 6
+  Source                Target            Weight Type  Edge_Color Edge_Thickness
+  &lt;chr&gt;                 &lt;chr&gt;              &lt;int&gt; &lt;chr&gt; &lt;chr&gt;               &lt;dbl&gt;
+1 Politecnico di Milano Università Bocco…     49 Undi… blue                   98
+2 Politecnico di Milano Università Catto…     37 Undi… blue                   74
+3 Università Bocconi    Università Catto…     32 Undi… blue                   64</code></pre>
+</div>
+</div>
+</section>
+<section id="export-for-qgis" class="level3" data-number="0.6">
+<h3 data-number="0.6" class="anchored" data-anchor-id="export-for-qgis"><span class="header-section-number">0.6</span> Export for QGIS</h3>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Complete QGIS Export Code for GEN26 Network</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to create QGIS-ready files</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>export_qgis_network_files <span class="ot">&lt;-</span> <span class="cf">function</span>(gen26_data, cp_results, <span class="at">output_dir =</span> <span class="st">"qgis_export"</span>) {</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create output directory</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(output_dir)) {</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dir.create</span>(output_dir)</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1. CREATE NODES SHAPEFILE</span></span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prepare node data with all attributes</span></span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>  nodes_data <span class="ot">&lt;-</span> gen26_data<span class="sc">$</span>uni_coords <span class="sc">%&gt;%</span></span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(cp_results<span class="sc">$</span>consensus, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"affil"</span> <span class="ot">=</span> <span class="st">"University"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb51-18"><a href="#cb51-18" aria-hidden="true" tabindex="-1"></a>      <span class="co"># University identifiers</span></span>
+<span id="cb51-19"><a href="#cb51-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">uni_id =</span> <span class="fu">row_number</span>(),</span>
+<span id="cb51-20"><a href="#cb51-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">uni_name =</span> affil,</span>
+<span id="cb51-21"><a href="#cb51-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-22"><a href="#cb51-22" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Core-Periphery attributes</span></span>
+<span id="cb51-23"><a href="#cb51-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">cp_role =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Consensus_Role), <span class="st">"PERIPHERY"</span>, Consensus_Role),</span>
+<span id="cb51-24"><a href="#cb51-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">core_votes =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Core_Votes), <span class="dv">0</span>, Core_Votes),</span>
+<span id="cb51-25"><a href="#cb51-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-26"><a href="#cb51-26" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Visual attributes for QGIS styling</span></span>
+<span id="cb51-27"><a href="#cb51-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">node_size =</span> <span class="fu">ifelse</span>(cp_role <span class="sc">==</span> <span class="st">"CORE"</span>, <span class="dv">8</span>, <span class="dv">5</span>),</span>
+<span id="cb51-28"><a href="#cb51-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">node_color =</span> <span class="fu">ifelse</span>(cp_role <span class="sc">==</span> <span class="st">"CORE"</span>, <span class="st">"red"</span>, <span class="st">"blue"</span>)</span>
+<span id="cb51-29"><a href="#cb51-29" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb51-30"><a href="#cb51-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(uni_id, uni_name, cp_role, core_votes, node_size, node_color, latitude, longitude)</span>
+<span id="cb51-31"><a href="#cb51-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-32"><a href="#cb51-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Convert to sf object and export as shapefile</span></span>
+<span id="cb51-33"><a href="#cb51-33" aria-hidden="true" tabindex="-1"></a>  nodes_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(nodes_data, </span>
+<span id="cb51-34"><a href="#cb51-34" aria-hidden="true" tabindex="-1"></a>                       <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"longitude"</span>, <span class="st">"latitude"</span>), </span>
+<span id="cb51-35"><a href="#cb51-35" aria-hidden="true" tabindex="-1"></a>                       <span class="at">crs =</span> <span class="dv">4326</span>)</span>
+<span id="cb51-36"><a href="#cb51-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-37"><a href="#cb51-37" aria-hidden="true" tabindex="-1"></a>  nodes_file <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_dir, <span class="st">"gen26_universities.shp"</span>)</span>
+<span id="cb51-38"><a href="#cb51-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_write</span>(nodes_sf, nodes_file, <span class="at">delete_dsn =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb51-39"><a href="#cb51-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-40"><a href="#cb51-40" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2. CREATE EDGES SHAPEFILE</span></span>
+<span id="cb51-41"><a href="#cb51-41" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Prepare edge data with coordinates</span></span>
+<span id="cb51-42"><a href="#cb51-42" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(gen26_data<span class="sc">$</span>edge_weights) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb51-43"><a href="#cb51-43" aria-hidden="true" tabindex="-1"></a>    edges_with_coords <span class="ot">&lt;-</span> gen26_data<span class="sc">$</span>edge_weights <span class="sc">%&gt;%</span></span>
+<span id="cb51-44"><a href="#cb51-44" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(gen26_data<span class="sc">$</span>uni_coords, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"uni1"</span> <span class="ot">=</span> <span class="st">"affil"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb51-45"><a href="#cb51-45" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">lat1 =</span> latitude, <span class="at">lon1 =</span> longitude) <span class="sc">%&gt;%</span></span>
+<span id="cb51-46"><a href="#cb51-46" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(gen26_data<span class="sc">$</span>uni_coords, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"uni2"</span> <span class="ot">=</span> <span class="st">"affil"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb51-47"><a href="#cb51-47" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">lat2 =</span> latitude, <span class="at">lon2 =</span> longitude) <span class="sc">%&gt;%</span></span>
+<span id="cb51-48"><a href="#cb51-48" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
+<span id="cb51-49"><a href="#cb51-49" aria-hidden="true" tabindex="-1"></a>        <span class="at">edge_id =</span> <span class="fu">row_number</span>(),</span>
+<span id="cb51-50"><a href="#cb51-50" aria-hidden="true" tabindex="-1"></a>        <span class="at">collab_weight =</span> weight,</span>
+<span id="cb51-51"><a href="#cb51-51" aria-hidden="true" tabindex="-1"></a>        <span class="at">line_width =</span> weight <span class="sc">*</span> <span class="fl">0.5</span>,  <span class="co"># Scale for QGIS styling</span></span>
+<span id="cb51-52"><a href="#cb51-52" aria-hidden="true" tabindex="-1"></a>        <span class="at">edge_label =</span> <span class="fu">paste0</span>(uni1, <span class="st">" ↔ "</span>, uni2, <span class="st">" ("</span>, weight, <span class="st">" papers)"</span>)</span>
+<span id="cb51-53"><a href="#cb51-53" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb51-54"><a href="#cb51-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-55"><a href="#cb51-55" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create line geometries</span></span>
+<span id="cb51-56"><a href="#cb51-56" aria-hidden="true" tabindex="-1"></a>    edges_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb51-57"><a href="#cb51-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(edges_with_coords)) {</span>
+<span id="cb51-58"><a href="#cb51-58" aria-hidden="true" tabindex="-1"></a>      edge <span class="ot">&lt;-</span> edges_with_coords[i, ]</span>
+<span id="cb51-59"><a href="#cb51-59" aria-hidden="true" tabindex="-1"></a>      line_coords <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(edge<span class="sc">$</span>lon1, edge<span class="sc">$</span>lat1, edge<span class="sc">$</span>lon2, edge<span class="sc">$</span>lat2), </span>
+<span id="cb51-60"><a href="#cb51-60" aria-hidden="true" tabindex="-1"></a>                           <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb51-61"><a href="#cb51-61" aria-hidden="true" tabindex="-1"></a>      edges_list[[i]] <span class="ot">&lt;-</span> <span class="fu">st_linestring</span>(line_coords)</span>
+<span id="cb51-62"><a href="#cb51-62" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb51-63"><a href="#cb51-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-64"><a href="#cb51-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create sf object for edges</span></span>
+<span id="cb51-65"><a href="#cb51-65" aria-hidden="true" tabindex="-1"></a>    edges_sf <span class="ot">&lt;-</span> <span class="fu">st_sf</span>(</span>
+<span id="cb51-66"><a href="#cb51-66" aria-hidden="true" tabindex="-1"></a>      <span class="at">edge_id =</span> edges_with_coords<span class="sc">$</span>edge_id,</span>
+<span id="cb51-67"><a href="#cb51-67" aria-hidden="true" tabindex="-1"></a>      <span class="at">uni1 =</span> edges_with_coords<span class="sc">$</span>uni1,</span>
+<span id="cb51-68"><a href="#cb51-68" aria-hidden="true" tabindex="-1"></a>      <span class="at">uni2 =</span> edges_with_coords<span class="sc">$</span>uni2,</span>
+<span id="cb51-69"><a href="#cb51-69" aria-hidden="true" tabindex="-1"></a>      <span class="at">weight =</span> edges_with_coords<span class="sc">$</span>collab_weight,</span>
+<span id="cb51-70"><a href="#cb51-70" aria-hidden="true" tabindex="-1"></a>      <span class="at">line_width =</span> edges_with_coords<span class="sc">$</span>line_width,</span>
+<span id="cb51-71"><a href="#cb51-71" aria-hidden="true" tabindex="-1"></a>      <span class="at">edge_label =</span> edges_with_coords<span class="sc">$</span>edge_label,</span>
+<span id="cb51-72"><a href="#cb51-72" aria-hidden="true" tabindex="-1"></a>      <span class="at">geometry =</span> <span class="fu">st_sfc</span>(edges_list, <span class="at">crs =</span> <span class="dv">4326</span>)</span>
+<span id="cb51-73"><a href="#cb51-73" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb51-74"><a href="#cb51-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-75"><a href="#cb51-75" aria-hidden="true" tabindex="-1"></a>    edges_file <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_dir, <span class="st">"gen26_collaborations.shp"</span>)</span>
+<span id="cb51-76"><a href="#cb51-76" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_write</span>(edges_sf, edges_file, <span class="at">delete_dsn =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb51-77"><a href="#cb51-77" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb51-78"><a href="#cb51-78" aria-hidden="true" tabindex="-1"></a>    edges_file <span class="ot">&lt;-</span> <span class="st">"No collaborations to export"</span></span>
+<span id="cb51-79"><a href="#cb51-79" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb51-80"><a href="#cb51-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-81"><a href="#cb51-81" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 3. CREATE CSV FILES (Alternative format)</span></span>
+<span id="cb51-82"><a href="#cb51-82" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Nodes CSV</span></span>
+<span id="cb51-83"><a href="#cb51-83" aria-hidden="true" tabindex="-1"></a>  nodes_csv <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_dir, <span class="st">"universities_coordinates.csv"</span>)</span>
+<span id="cb51-84"><a href="#cb51-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write.csv</span>(nodes_data, nodes_csv, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb51-85"><a href="#cb51-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-86"><a href="#cb51-86" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Edges CSV (for hub lines tool)</span></span>
+<span id="cb51-87"><a href="#cb51-87" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">nrow</span>(gen26_data<span class="sc">$</span>edge_weights) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb51-88"><a href="#cb51-88" aria-hidden="true" tabindex="-1"></a>    edges_csv_data <span class="ot">&lt;-</span> gen26_data<span class="sc">$</span>edge_weights <span class="sc">%&gt;%</span></span>
+<span id="cb51-89"><a href="#cb51-89" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(gen26_data<span class="sc">$</span>uni_coords, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"uni1"</span> <span class="ot">=</span> <span class="st">"affil"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb51-90"><a href="#cb51-90" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">hub_lat =</span> latitude, <span class="at">hub_lon =</span> longitude, <span class="at">hub_name =</span> uni1) <span class="sc">%&gt;%</span></span>
+<span id="cb51-91"><a href="#cb51-91" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(gen26_data<span class="sc">$</span>uni_coords, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"uni2"</span> <span class="ot">=</span> <span class="st">"affil"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb51-92"><a href="#cb51-92" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">spoke_lat =</span> latitude, <span class="at">spoke_lon =</span> longitude, <span class="at">spoke_name =</span> uni2) <span class="sc">%&gt;%</span></span>
+<span id="cb51-93"><a href="#cb51-93" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(hub_name, hub_lat, hub_lon, spoke_name, spoke_lat, spoke_lon, weight)</span>
+<span id="cb51-94"><a href="#cb51-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-95"><a href="#cb51-95" aria-hidden="true" tabindex="-1"></a>    edges_csv <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_dir, <span class="st">"collaborations_coordinates.csv"</span>)</span>
+<span id="cb51-96"><a href="#cb51-96" aria-hidden="true" tabindex="-1"></a>    <span class="fu">write.csv</span>(edges_csv_data, edges_csv, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb51-97"><a href="#cb51-97" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb51-98"><a href="#cb51-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-99"><a href="#cb51-99" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Print summary</span></span>
+<span id="cb51-100"><a href="#cb51-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"=== QGIS EXPORT SUMMARY ===</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb51-101"><a href="#cb51-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Nodes shapefile:"</span>, nodes_file, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb51-102"><a href="#cb51-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Edges shapefile:"</span>, edges_file, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb51-103"><a href="#cb51-103" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Nodes CSV:"</span>, nodes_csv, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb51-104"><a href="#cb51-104" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">exists</span>(<span class="st">"edges_csv"</span>)) <span class="fu">cat</span>(<span class="st">"Edges CSV:"</span>, edges_csv, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb51-105"><a href="#cb51-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Total universities:"</span>, <span class="fu">nrow</span>(nodes_data), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb51-106"><a href="#cb51-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Total collaborations:"</span>, <span class="fu">nrow</span>(gen26_data<span class="sc">$</span>edge_weights), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb51-107"><a href="#cb51-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-108"><a href="#cb51-108" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb51-109"><a href="#cb51-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">nodes_shp =</span> nodes_file,</span>
+<span id="cb51-110"><a href="#cb51-110" aria-hidden="true" tabindex="-1"></a>    <span class="at">edges_shp =</span> edges_file,</span>
+<span id="cb51-111"><a href="#cb51-111" aria-hidden="true" tabindex="-1"></a>    <span class="at">nodes_csv =</span> nodes_csv,</span>
+<span id="cb51-112"><a href="#cb51-112" aria-hidden="true" tabindex="-1"></a>    <span class="at">edges_csv =</span> <span class="cf">if</span>(<span class="fu">exists</span>(<span class="st">"edges_csv"</span>)) edges_csv <span class="cf">else</span> <span class="cn">NULL</span></span>
+<span id="cb51-113"><a href="#cb51-113" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb51-114"><a href="#cb51-114" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb51-115"><a href="#cb51-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-116"><a href="#cb51-116" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute the export</span></span>
+<span id="cb51-117"><a href="#cb51-117" aria-hidden="true" tabindex="-1"></a>qgis_files <span class="ot">&lt;-</span> <span class="fu">export_qgis_network_files</span>(gen26_data, cp_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Deleting source `qgis_export/gen26_universities.shp' using driver `ESRI Shapefile'
+Writing layer `gen26_universities' to data source 
+  `qgis_export/gen26_universities.shp' using driver `ESRI Shapefile'
+Writing 3 features with 6 fields and geometry type Point.
+Deleting source `qgis_export/gen26_collaborations.shp' using driver `ESRI Shapefile'
+Writing layer `gen26_collaborations' to data source 
+  `qgis_export/gen26_collaborations.shp' using driver `ESRI Shapefile'
+Writing 3 features with 6 fields and geometry type Line String.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== QGIS EXPORT SUMMARY ===
+Nodes shapefile: qgis_export/gen26_universities.shp 
+Edges shapefile: qgis_export/gen26_collaborations.shp 
+Nodes CSV: qgis_export/universities_coordinates.csv 
+Edges CSV: qgis_export/collaborations_coordinates.csv 
+Total universities: 3 
+Total collaborations: 3 </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

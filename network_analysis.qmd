@@ -17,6 +17,7 @@ execute:
 ```{r}
 library(dplyr)
 library(igraph)
+library(tidyr)
 
 c_preview <- read.csv("c_preview.csv", stringsAsFactors = FALSE)
 c_preview_geocoded <- read.csv("c_preview_geocoded.csv", stringsAsFactors = FALSE)
@@ -329,6 +330,7 @@ create_edges_map <- function(gen26_data, cp_results) {
 
     # Prepare edge data with coordinates
     edges_with_coords <- gen26_data$edge_weights %>%
+      mutate(weight_factor = as.factor(weight)) %>%
       left_join(gen26_data$uni_coords, by = c("uni1" = "affil")) %>%
       rename(lat1 = latitude, lon1 = longitude) %>%
       left_join(gen26_data$uni_coords, by = c("uni2" = "affil")) %>%
@@ -358,12 +360,12 @@ create_edges_map <- function(gen26_data, cp_results) {
       select(-lat1, -lon1, -lat2, -lon2) %>%
       unnest(path_data)
 
-    # Plot edges map
+    # Plot edges map with discrete colors
     ggplot() +
       geom_path(data = edges_curved,
                 aes(x = lon, y = lat, 
                     group = interaction(uni1, uni2),
-                    color = weight, size = weight),
+                    color = weight_factor, size = weight),
                 alpha = 0.7) +
       geom_point(data = gen26_data$uni_coords,
                  aes(x = longitude, y = latitude),
@@ -371,110 +373,18 @@ create_edges_map <- function(gen26_data, cp_results) {
       geom_text(data = gen26_data$uni_coords,
                 aes(x = longitude, y = latitude, label = affil),
                 vjust = -0.5, hjust = 0.5, size = 3, fontface = "bold") +
-      scale_color_gradient(low = "lightblue", high = "darkblue") +
-      scale_size_continuous(range = c(1, 4)) +
+      scale_color_brewer(palette = "Blues", direction = 1, 
+                         name = "Collaborations") +
+      scale_size_continuous(range = c(1, 4), guide = "none") +
       theme_minimal() +
       theme(axis.title = element_blank(),
             axis.text = element_blank(),
             panel.grid = element_blank()) +
       labs(title = "GEN26 University Collaboration Network - Edges and Weights",
-           subtitle = "Edge thickness and color represent collaboration intensity",
-           color = "Collaborations", size = "Collaborations")
+           subtitle = "Edge thickness and color represent collaboration intensity")
   }
 }
 
-# FIXED MAP 2: World Map with Regional Zoom
-create_world_map_zoom <- function(gen26_data, cp_results) {
-
-  # Get world map
-  world_map <- map_data("world")
-
-  # Calculate region boundaries
-  coords <- gen26_data$uni_coords
-  lat_range <- range(coords$latitude, na.rm = TRUE)
-  lon_range <- range(coords$longitude, na.rm = TRUE)
-
-  # Add padding
-  lat_padding <- diff(lat_range) * 0.3
-  lon_padding <- diff(lon_range) * 0.3
-
-  zoom_bounds <- list(
-    lat_min = lat_range[1] - lat_padding,
-    lat_max = lat_range[2] + lat_padding,
-    lon_min = lon_range[1] - lon_padding,
-    lon_max = lon_range[2] + lon_padding
-  )
-
-  # Filter world map for region
-  region_map <- world_map %>%
-    filter(lat >= zoom_bounds$lat_min & lat <= zoom_bounds$lat_max,
-           long >= zoom_bounds$lon_min & long <= zoom_bounds$lon_max)
-
-  # Prepare edge data
-  edges_with_coords <- gen26_data$edge_weights %>%
-    left_join(gen26_data$uni_coords, by = c("uni1" = "affil")) %>%
-    rename(lat1 = latitude, lon1 = longitude) %>%
-    left_join(gen26_data$uni_coords, by = c("uni2" = "affil")) %>%
-    rename(lat2 = latitude, lon2 = longitude)
-
-  # Add core-periphery information to coordinates (FIXED)
-  coords_with_cp <- gen26_data$uni_coords %>%
-    left_join(cp_results$consensus, by = c("affil" = "University")) %>%
-    # Ensure Consensus_Role is properly set
-    mutate(
-      Consensus_Role = ifelse(is.na(Consensus_Role), "PERIPHERY", Consensus_Role),
-      Consensus_Role = as.factor(Consensus_Role),  # Convert to factor
-      node_size = ifelse(Consensus_Role == "CORE", 4, 3)  # Create numeric size
-    )
-
-  # Debug: Check the data structure
-  cat("Consensus_Role values:", unique(coords_with_cp$Consensus_Role), "\n")
-  cat("Node sizes:", unique(coords_with_cp$node_size), "\n")
-
-  # Create the map
-  ggplot() +
-    # World map background
-    geom_polygon(data = region_map, 
-                 aes(x = long, y = lat, group = group),
-                 fill = "gray95", color = "gray70", size = 0.3) +
-    # Edges (straight lines) - only if edges exist
-    {if(nrow(edges_with_coords) > 0) {
-      geom_segment(data = edges_with_coords,
-                   aes(x = lon1, y = lat1, 
-                       xend = lon2, yend = lat2,
-                       alpha = weight, size = weight),
-                   color = "blue")
-    }} +
-    # Nodes colored by core-periphery role
-    geom_point(data = coords_with_cp,
-               aes(x = longitude, y = latitude, 
-                   color = Consensus_Role),
-               size = coords_with_cp$node_size,  # Use numeric size directly
-               alpha = 0.8) +
-    # University labels
-    geom_text(data = coords_with_cp,
-              aes(x = longitude, y = latitude, label = affil),
-              vjust = -0.8, hjust = 0.5, size = 2.5, fontface = "bold") +
-    # Styling (FIXED)
-    scale_color_manual(values = c("CORE" = "red", "PERIPHERY" = "lightblue"),
-                       na.value = "gray") +
-    {if(nrow(edges_with_coords) > 0) {
-      list(
-        scale_alpha_continuous(range = c(0.3, 1.0), name = "Collaborations"),
-        scale_size_continuous(range = c(0.5, 3), name = "Edge Weight")
-      )
-    }} +
-    coord_fixed(1.3, xlim = c(zoom_bounds$lon_min, zoom_bounds$lon_max),
-                     ylim = c(zoom_bounds$lat_min, zoom_bounds$lat_max)) +
-    theme_minimal() +
-    theme(panel.grid = element_blank(),
-          axis.title = element_blank(),
-          axis.text = element_blank(),
-          legend.position = "bottom") +
-    labs(title = "GEN26 Universities: Geographic Core-Periphery Network",
-         subtitle = "Red = Core Universities, Blue = Periphery Universities",
-         color = "Role")
-}
 
 # Original network visualization
 visualize_core_periphery <- function(network, cp_result) {
@@ -513,9 +423,6 @@ visualize_core_periphery(gen26_network, cp_results)
 edges_map <- create_edges_map(gen26_data, cp_results)
 print(edges_map)
 
-# 3. World map with regional zoom
-world_zoom_map <- create_world_map_zoom(gen26_data, cp_results)
-print(world_zoom_map)
 
 # Export summary data
 network_summary <- list(
@@ -528,6 +435,253 @@ network_summary <- list(
 
 cat("\n=== NETWORK SUMMARY ===\n")
 print(network_summary)
+
+```
+
+### Network figure visualized
+
+```{r}
+library(igraph)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(maps)
+library(tidygeocoder)
+
+# Load data
+c_preview <- read.csv("c_preview_geocoded.csv", stringsAsFactors = FALSE)
+c_preview_geocoded <- read.csv("c_preview_geocoded.csv", stringsAsFactors = FALSE)
+
+# Definieren Sie die Ziel-Universitäten
+TARGET_UNIVERSITIES <- c(
+  "Università Bocconi",
+  "Università degli studi di Verona", 
+  "Università Cattolica del Sacro Cuore",
+  "Università IULM Milano",
+  "Politecnico di Milano"
+)
+
+# Filtern Sie c_preview VOR der Paar-Erstellung
+c_preview_filtered <- c_preview %>%
+  filter(affil %in% TARGET_UNIVERSITIES)
+
+# Dann erstellen Sie die Kollaborationspaare
+collab_pairs <- c_preview_filtered %>%
+  select(eid, affil) %>%
+  distinct() %>%
+  group_by(eid) %>%
+  do({
+    unis <- .$affil
+    if(length(unis) >= 2) {
+      expand.grid(uni1 = unis, uni2 = unis, stringsAsFactors = FALSE) %>%
+        filter(uni1 < uni2)
+    } else {
+      data.frame(uni1 = character(0), uni2 = character(0))
+    }
+  }) %>%
+  ungroup()
+
+# Count collaboration weights
+edge_weights <- collab_pairs %>%
+  count(uni1, uni2, name = "weight")
+
+# Extract universities that actually have collaborations
+active_universities <- unique(c(edge_weights$uni1, edge_weights$uni2))
+
+# Identify missing universities from geocoded data
+existing_unis <- c_preview_geocoded$affil
+missing_unis <- setdiff(active_universities, existing_unis)
+
+# Geocode missing universities using OSM
+if(length(missing_unis) > 0) {
+  cat("Geocoding missing universities:", paste(missing_unis, collapse = ", "), "\n")
+
+  missing_df <- data.frame(affil = missing_unis, stringsAsFactors = FALSE)
+
+  geocoded_missing <- missing_df %>%
+    geocode(address = affil, method = "osm", lat = latitude, long = longitude)
+
+  # Merge with existing geocoded data
+  c_preview_geocoded <- c_preview_geocoded %>%
+    bind_rows(geocoded_missing) %>%
+    distinct(affil, .keep_all = TRUE)
+
+  cat("Geocoding complete!\n")
+  print(geocoded_missing)
+}
+
+# Get coordinates only for universities with collaborations
+uni_coords <- c_preview_geocoded %>%
+  select(affil, latitude, longitude) %>%
+  distinct() %>%
+  filter(affil %in% active_universities)
+
+# Create igraph with only active universities
+g <- make_empty_graph(n = 0, directed = FALSE)
+g <- add_vertices(g, length(active_universities), name = active_universities)
+
+# Add coordinates as vertex attributes
+for(i in 1:length(active_universities)) {
+  uni_name <- active_universities[i]
+  coords <- uni_coords[uni_coords$affil == uni_name, ]
+  if(nrow(coords) > 0) {
+    V(g)[uni_name]$latitude <- coords$latitude[1]
+    V(g)[uni_name]$longitude <- coords$longitude[1]
+  }
+}
+
+# Add edges
+if(nrow(edge_weights) > 0) {
+  edge_list <- as.matrix(edge_weights[, c("uni1", "uni2")])
+  g <- add_edges(g, t(edge_list))
+  E(g)$weight <- edge_weights$weight
+}
+
+# Create map-based visualization
+create_map_network <- function(graph, uni_coords) {
+
+  # Get map boundaries with padding
+  lat_range <- range(uni_coords$latitude, na.rm = TRUE)
+  lon_range <- range(uni_coords$longitude, na.rm = TRUE)
+  lat_pad <- diff(lat_range) * 0.3
+  lon_pad <- diff(lon_range) * 0.3
+
+  # Get world map data
+  world_map <- map_data("world")
+
+  # Filter map for Italian region
+  region_countries <- c("Italy", "Switzerland", "Austria", "France", "Slovenia", "Croatia")
+  region_map <- world_map %>%
+    filter(region %in% region_countries)
+
+  # Prepare edge data
+  edge_data <- data.frame()
+  if(ecount(graph) > 0) {
+    for(i in 1:ecount(graph)) {
+      edge <- ends(graph, i)
+      v1 <- edge[1]
+      v2 <- edge[2]
+      edge_data <- rbind(edge_data, data.frame(
+        x = V(graph)[v1]$longitude,
+        y = V(graph)[v1]$latitude,
+        xend = V(graph)[v2]$longitude,
+        yend = V(graph)[v2]$latitude,
+        weight = E(graph)$weight[i]
+      ))
+    }
+  }
+
+  # Create plot
+  p <- ggplot() +
+    geom_polygon(data = region_map, 
+                 aes(x = long, y = lat, group = group),
+                 fill = "gray90", color = "white", linewidth = 0.3) +
+    {if(nrow(edge_data) > 0) {
+      geom_segment(data = edge_data,
+                   aes(x = x, y = y, xend = xend, yend = yend, 
+                       linewidth = weight, alpha = weight),
+                   color = "blue")
+    }} +
+    geom_point(data = uni_coords,
+               aes(x = longitude, y = latitude),
+               color = "red", size = 5, alpha = 0.8) +
+    geom_text(data = uni_coords,
+              aes(x = longitude, y = latitude, label = affil),
+              vjust = -0.8, size = 3, fontface = "bold") +
+    scale_linewidth_continuous(range = c(0.5, 3), name = "Collaborations") +
+    scale_alpha_continuous(range = c(0.3, 1.0), guide = "none") +
+    coord_fixed(1.3, 
+                xlim = c(lon_range[1] - lon_pad, lon_range[2] + lon_pad),
+                ylim = c(lat_range[1] - lat_pad, lat_range[2] + lat_pad)) +
+    theme_minimal() +
+    theme(panel.grid.major = element_line(color = "gray95", linewidth = 0.2),
+          panel.background = element_rect(fill = "aliceblue"),
+          axis.title = element_blank()) +
+    labs(title = "GEN26 University Collaboration Network",
+         subtitle = "Universities with active collaborations | Edge thickness = collaboration weight")
+
+  return(p)
+}
+
+# Generate visualization
+map_plot <- create_map_network(g, uni_coords)
+print(map_plot)
+
+# Network summary
+cat("\nNetwork Summary:\n")
+cat("Total universities in network:", vcount(g), "\n")
+cat("Active collaborations:", ecount(g), "\n")
+if(ecount(g) > 0) {
+  cat("Total collaborative papers:", sum(E(g)$weight), "\n")
+}
+
+cat("\nUniversities in Network:\n")
+print(uni_coords)
+
+
+```
+
+### Bar Chart
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(igraph)
+
+# Create edge list from collaboration data
+collab_pairs <- c_preview %>%
+  select(eid, affil) %>%
+  distinct() %>%
+  group_by(eid) %>%
+  do({
+    unis <- .$affil
+    if(length(unis) >= 2) {
+      expand.grid(uni1 = unis, uni2 = unis, stringsAsFactors = FALSE) %>%
+        filter(uni1 < uni2)
+    } else {
+      data.frame(uni1 = character(0), uni2 = character(0))
+    }
+  }) %>%
+  ungroup() %>%
+  count(uni1, uni2, name = "weight")
+
+# Create network graph
+g <- graph_from_data_frame(collab_pairs, directed = FALSE, 
+                           vertices = data.frame(name = TARGET_UNIVERSITIES))
+E(g)$weight <- collab_pairs$weight
+
+# Calculate node metrics
+node_data <- data.frame(
+  University = V(g)$name,
+  Degree = degree(g),
+  Betweenness = betweenness(g, weights = NA),
+  Collaborations = strength(g)
+) %>%
+  mutate(Collaborations = as.factor(Collaborations)) %>%
+  arrange(desc(Degree))
+
+# Create visualization with discrete colors
+ggplot(node_data, aes(x = reorder(University, Degree), y = Degree)) +
+  geom_col(aes(fill = Collaborations), width = 0.7) +
+  geom_text(aes(label = Degree), hjust = -0.3, size = 3.5) +
+  scale_fill_brewer(palette = "Blues", direction = 1,
+                    name = "Total\nCollaborations") +
+  coord_flip() +
+  labs(
+    title = "University Collaboration Network Metrics",
+    subtitle = "Number of partner institutions and total collaborative publications",
+    x = NULL,
+    y = "Number of Partner Universities (Degree)"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 10, color = "gray40"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "right"
+  ) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15)))
 
 ```
 
